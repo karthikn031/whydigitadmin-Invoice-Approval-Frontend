@@ -4,7 +4,9 @@ import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://192.168.68.101:8091";
+import confetti from 'canvas-confetti';
+
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8091";
 
 const ConfirmationPage = () => {
   const [searchParams] = useSearchParams();
@@ -52,10 +54,33 @@ const ConfirmationPage = () => {
     }
   };
 
+
+  const handleCelebrate = () => {
+    // Trigger confetti
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+    });
+
+    // Button animation
+    const button = document.getElementById('celebrateBtn');
+    if (button) {
+      button.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        button.style.transform = 'scale(1)';
+      }, 100);
+    }
+  }
+  
   useEffect(() => {
     // Call the API when the page loads
     handleApprove();
   }, [actionId, isApprove]);
+
+  if (isSuccess) {
+    handleCelebrate();
+  }
 
   if (isLoading) {
     return (
@@ -73,6 +98,14 @@ const ConfirmationPage = () => {
     );
   }
 
+  
+
+  
+
+  
+  
+  
+
   return (
     <div
       style={{
@@ -89,13 +122,14 @@ const ConfirmationPage = () => {
           textAlign: "center",
           borderRadius: "15px",
             boxShadow: "0 8px 20px rgba(0, 0, 0, 0.1)",
-            maxHeight:350
+            maxHeight:550
         }}
       >
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
+          
         >
           {/* Add icon logic here if needed */}
         </motion.div>
@@ -108,6 +142,7 @@ const ConfirmationPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.5 }}
                 style={{ color: "green" }}
+                
               >
                 Approval Successful
               </motion.h4>

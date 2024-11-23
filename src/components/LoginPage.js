@@ -3,9 +3,20 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { encryptPassword } from "../utils/passEnc";
+import logo from "../logo.png";
+import logoonly from "../logoonly.jpg";
+import { SunOutlined, MoonOutlined } from "@ant-design/icons";
+import './style.css';
+import './logintest1.css';
+import butterfly from"../butterfly.gif";
+import confetti from 'canvas-confetti';
+
+
+
+
 
 const { Text } = Typography;
-const API_URL = process.env.REACT_APP_API_URL || "http://192.168.68.101:8091";
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8091";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -13,8 +24,38 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // Toggle passcode visibility
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light"); // Default theme from localStorage
   const navigate = useNavigate();
+  
+  
+ 
+
+  const handleCelebrate = () => {
+    // Trigger confetti
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+    });
+
+    // Button animation
+    const button = document.getElementById('celebrateBtn');
+    if (button) {
+      button.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        button.style.transform = 'scale(1)';
+      }, 100);
+    }
+  }
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    handleCelebrate();
+  }, 20000); // Trigger every 1 second
+
+  // Cleanup the interval when the component unmounts
+  return () => clearInterval(interval);
+}) 
 
   useEffect(() => {
     if (error || success) {
@@ -84,6 +125,9 @@ const LoginPage = () => {
         const userType = response.data.paramObjectsMap?.userVO?.userType;
         localStorage.setItem("userType", userType);
 
+        const email = response.data.paramObjectsMap?.userVO?.email;
+        localStorage.setItem("email", email );
+
         navigate("/listing");
       } else {
         setError("Login failed. Please try again.");
@@ -99,17 +143,147 @@ const LoginPage = () => {
     }
   };
 
+  // Toggle Theme
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme); // Persist theme to localStorage
+  };
+
+  // useEffect(() => {
+  //   if (theme === "dark") {
+  //     // document.body.style.backgroundColor = "#1c1c1c"; // Dark background for the entire page
+
+  //     document.body.style.backgroundColor = "#262626";
+  //     document.body.style.color = "#fff"; // White text for dark mode
+  //   } else {
+  //     document.body.style.backgroundColor = "#fff"; // Light background for the body
+  //     document.body.style.color = "#000"; // Black text for light mode
+  //   }
+  // }, [theme]);
+
+  useEffect(() => {
+    // If the current route is the login page, keep the background light
+    if (window.location.pathname === "/login") {
+      document.body.style.backgroundColor = "#fff"; // Always light background for the login page
+      document.body.style.color = "#000"; // Black text for light mode
+    } else {
+      if (theme === "dark") {
+        document.body.style.backgroundColor = "#262626"; // Dark background
+        document.body.style.color = "#fff"; // White text for dark mode
+      } else {
+        document.body.style.backgroundColor = "#fff"; // Light background for the body
+        document.body.style.color = "#000"; // Black text for light mode
+      }
+    }
+  }, [theme]); // This effect runs whenever the theme changes
+
+  useEffect(() => {
+    // Ensure that the login page has a light background regardless of theme
+    document.body.style.backgroundColor = "#fff";
+    document.body.style.color = "#000"; // Black text for light mode
+
+    // Clean up effect if needed
+    return () => {
+      // Reset styles if needed when the page unmounts
+      document.body.style.backgroundColor = "";
+      document.body.style.color = "";
+    };
+  }, []); // This effect only runs once when the component mounts
+  // Dark mode styles for card and inputs
+  const cardStyle = theme === "dark"
+    ? { backgroundColor: "#fff", borderColor: "#444", color: "#000" }  // Card background stays white
+    : { backgroundColor: "#fff", borderColor: "#d9d9d9", color: "#000" };
+
+  const inputStyle = theme === "dark"
+    ? { backgroundColor: "#fff", color: "#000", borderColor: "#666" }  // White background with black text
+    : { backgroundColor: "#fff", color: "#000", borderColor: "#d9d9d9" };  // Light mode styling
+
+
+    
+      useEffect(() => {
+        // Select all elements with the "arc-text" class
+        const arcParagraphs = document.querySelectorAll(".arc-text");
+    
+        // Iterate over each <p> element
+        arcParagraphs.forEach((paragraph, index) => {
+          // Access the index 'n' and the paragraph element
+          const n = index + 1; // Convert zero-based index to one-based index
+          paragraph.innerHTML = paragraph.innerText
+            .split("")
+            .map(
+              (char, i) =>
+                `<span style="display: inline-block; transform:rotate(${
+                  i * (n * 5)
+                }deg)">${char}</span>`
+            )
+            .join("");
+        });
+      }, []); // Run once after the component mounts
+
+     
+
+  
+      const baseStyle = {
+        // fontfamily: '"Reggae One", CenturyGothic, "AppleGothic", sans-serif',
+        fontFamily: '"Familjen Grotesk"',
+        color: '#00008B',
+  fontsize: '72px',
+  padding: '10px 40px',
+  textalign: 'center',
+  // texttransform: 'uppercase',
+  textrendering: 'optimizeLegibility',
+      };
+    
+      const elegantShadowStyle = {
+        // color: '#131313',
+        color: '#00008B',
+  backgroundcolor: '#e7e5e4',
+  letterspacing: '.15em',
+        textShadow: `
+          1px -1px 0 #767676, -1px 2px 1px #737272, -2px 4px 1px #767474, -3px 6px 1px #787777, -4px 8px 1px #7b7a7a, -5px 10px 1px #7f7d7d, -6px 12px 1px #828181, -7px 14px 1px #868585, -8px 16px 1px #8b8a89, -9px 18px 1px #8f8e8d, -10px 20px 1px #949392, -11px 22px 1px #999897, -12px 24px 1px #9e9c9c, -13px 26px 1px #a3a1a1, -14px 28px 1px #a8a6a6, -15px 30px 1px #adabab, -16px 32px 1px #b2b1b0, -17px 34px 1px #b7b6b5, -18px 36px 1px #bcbbba, -19px 38px 1px #c1bfbf, -20px 40px 1px #c6c4c4, -21px 42px 1px #cbc9c8, -22px 44px 1px #cfcdcd, -23px 46px 1px #d4d2d1, -24px 48px 1px #d8d6d5, -25px 50px 1px #dbdad9, -26px 52px 1px #dfdddc, -27px 54px 1px #e2e0df, -28px 56px 1px #e4e3e2`,
+      };
+
+      const retroshadowStyle = {
+        fontFamily: 'Arial, sans-serif',  // You can choose any font family you want
+        fontSize: '30px',  // Example font size
+        color: '#333',  // Example text color
+        textShadow: '#999 3px 3px 5px',  // Applying the text-shadow style
+      }
+
   return (
+
+<>
+
+
+
+
+{/* <body>
+      <ul>
+
+      <li>U</li>
+      <li>N</li>
+      <li>I</li>
+      <li>W</li>
+      <li>O</li>
+      <li>R</li>
+      <li>L</li>
+      <li>D</li>
+    </ul>
+    </body> */}
+
+
+
+
     <div
       style={{
         display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "95vh",
-        // background:
-        //   "linear-gradient(90deg, rgba(18, 94, 227, 1) 0%, rgba(50, 154, 255, 1) 100%)",
-        fontFamily: "Arial, sans-serif",
-        background: "#f1f1f1",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "95vh",
+      // fontFamily: "Arial, sans-serif",
+      background: "#fff", // Ensure background is light
+        // background:"#cd995f"
       }}
     >
       {(error || success) && (
@@ -119,34 +293,130 @@ const LoginPage = () => {
             top: 30,
             width: "100%",
             maxWidth: "400px",
+            
           }}
         >
+          
           {error && <Alert message={error} type="error" showIcon />}
           {success && <Alert message={success} type="success" showIcon />}
         </div>
+
+        
       )}
 
+{/* <div> */}
+{/* <img class="fog__img i1" src="https://i.postimg.cc/6624SnRw/fog-bl.png" width="50"  height="50" alt=""/> */}
+    {/* <img class="fog__img i2"  src="https://i.postimg.cc/6624SnRw/fog-bl.png" width="50"  height="50"alt=""/> */}
+    {/* <img class="fog__img i3" src="https://i.postimg.cc/6624SnRw/fog-bl.png" width="50"  height="50" alt=""/> */}
+    {/* <img class="fog__img i4"   src="https://i.postimg.cc/6624SnRw/fog-bl.png"  width="50"  height="50"alt=""/> */}
+    {/* </div> */}
+
+  
+      
+    {/* <div className="circular-text" style={{font : "Arial"}}>
+    <div className="animated-arc">
+        <p className="arc-text" style={{ "--i": 1 }}>
+          "- Yesterday, all my troubles seemed so far away, But now it looks as ..""
+        </p>
+      </div>
+      <div className="animated-arc">
+        <p className="arc-text" style={{ "--i": 2 }}>
+          &gt; though they're here to stay, Oh I
+        </p>
+      </div>
+      <div className="animated-arc">
+        <p className="arc-text" style={{ "--i": 3 }}>
+          &gt; believe in yesterday
+        </p>
+      </div>
+</div> */}
+
+
+
+<div class='img'>
+
+        {/* <img  src='https://i.pinimg.com/originals/66/b0/02/66b002f6f5022553a6cf52d8d01241df.gif' /> */}
+
+        {/* <img src={butterfly}></img> */}
+
+        <img src={logoonly} width="400"  ></img> <br/>
+
+
+        <h2 style={{  ...baseStyle,...elegantShadowStyle,}}>
+          
+          Uniworld <br/>
+          Logistics
+          
+  {/* <span>Uniworld</span> <br/>
+  <span>Logistics</span> */}
+</h2>
+  
+
+
+      </div>
+
+      {/* <div class="hero-students">
+  <div>
+  <h1>
+    <span data-text="Hi">Hi</span><br/>
+    <span data-text="Welcome!">Welcome!</span>
+  </h1>
+    
+  </div>
+</div> */}
+
+
+  
+    
       <Card
         title={
           <Text
             strong
-            style={{ fontSize: 28, textAlign: "center", color: "#000000" }}
+            style={{
+              // fontSize: 20,
+              // textAlign: "center",
+              color: cardStyle.color,
+            }}
           >
-            Welcome Back!
+    {/* <h1>Uniworld<br/><span style={{background:"white"}}>Welcome!!!</span></h1>         */}
+    {/* <h1>Welcome To<br/><span style={{background:"white"}}>UGS</span></h1>         */}
+     {/* style={{ ...baseStyle, ...elegantShadowStyle }}>Welcome To <br/> UGS */}
+            {/* Welcome!!!  */}
+
+            <div><h2 style={{
+              ...retroshadowStyle,
+              // margin: 'auto',
+              // fontsize: '50px',
+              // textShadow: `
+              // 0px 3px 0px #ffdd40, 
+              // 0px 14px 10px rgba(0, 0, 0, 0.15),
+              // 0px 24px 2px rgba(0, 0, 0, 0.1), 
+              // 0px 24px 30px rgba(0, 0, 0, 0.1)`
+            }}>Welcome To <br/> UGS</h2> </div> <br/>
+        
+   
           </Text>
         }
         style={{
           borderRadius: 12,
-          boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
           padding: "25px",
           width: "100%",
           maxWidth: 400,
-          background: "#fff",
+          backgroundColor: cardStyle.backgroundColor,
+          borderColor: cardStyle.borderColor,
+          boxShadow: "0 8px 16px rgba(0, 0, 0, 0.1)",
+          
         }}
       >
+        {/* <img src={logo} alt="Logo" className="logo" /> */}
         <Space direction="vertical" style={{ width: "100%" }}>
           <Text
-            style={{ fontSize: 16, textAlign: "center", marginBottom: "15px" }}
+            style={{
+              fontSize: 16,
+              textAlign: "center",
+              marginBottom: "15px",
+              color: cardStyle.color,
+            }}
           >
             Enter Username
           </Text>
@@ -158,13 +428,18 @@ const LoginPage = () => {
               padding: "10px",
               fontSize: 16,
               borderRadius: 8,
-              border: "1px solid #d9d9d9",
+              ...inputStyle,
               marginBottom: "15px",
             }}
           />
 
           <Text
-            style={{ fontSize: 16, textAlign: "center", marginBottom: "15px" }}
+            style={{
+              fontSize: 16,
+              textAlign: "center",
+              marginBottom: "15px",
+              color: cardStyle.color,
+            }}
           >
             Enter 6-Digit Passcode
           </Text>
@@ -183,7 +458,7 @@ const LoginPage = () => {
                   textAlign: "center",
                   fontSize: "16px",
                   borderRadius: "8px",
-                  border: "1px solid #d9d9d9",
+                  ...inputStyle,
                 }}
               />
             ))}
@@ -205,9 +480,22 @@ const LoginPage = () => {
           >
             Login
           </Button>
+
+          {/* Dark Mode Toggle */}
+          <Button
+            type="text"
+            icon={theme === "light" ? <MoonOutlined /> : <SunOutlined />}
+            onClick={toggleTheme}
+            size="small"
+            style={{ marginLeft: "10px" }}
+          >
+            {theme === "light" ? "Dark Mode" : "Light Mode"}
+          </Button>
         </Space>
       </Card>
-    </div>
+      </div>
+     
+    </>
   );
 };
 
