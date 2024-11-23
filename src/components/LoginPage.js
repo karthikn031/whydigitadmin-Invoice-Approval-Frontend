@@ -339,17 +339,17 @@ useEffect(() => {
 
         {/* <img src={butterfly}></img> */}
 
-        <img src={logoonly} width="400"  ></img> <br/>
+        {/* <img src={logoonly} width="400"  ></img> <br/> */}
 
 
-        <h2 style={{  ...baseStyle,...elegantShadowStyle,}}>
+        {/* <h2 style={{  ...baseStyle,...elegantShadowStyle,}}> */}
           
-          Uniworld <br/>
-          Logistics
+          {/* Uniworld <br/>
+          Logistics */}
           
   {/* <span>Uniworld</span> <br/>
   <span>Logistics</span> */}
-</h2>
+{/* </h2> */}
   
 
 

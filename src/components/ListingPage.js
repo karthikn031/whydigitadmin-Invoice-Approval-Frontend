@@ -212,13 +212,10 @@ const ListingPage = () => {
   };
 
   const approvedList = () => {
-    navigate("/ApprovedTest"); // Navigate to the approved list page
+    navigate("/ApprovedList"); // Navigate to the approved list page
   };
 
-  const colortheme=() =>
-    {
-      navigate("/Listing");
-    }
+  
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -407,16 +404,7 @@ const toInitCap = (str) => {
                 >
                   Approved List
                 </Button>
-
                 
-                <Button
-                  type="text"
-                  icon={<RightCircleOutlined />}
-                  onClick={colortheme}
-                  size="small"
-                >
-                  ThemeExit
-                </Button>
               </Space>
             </Card>
 

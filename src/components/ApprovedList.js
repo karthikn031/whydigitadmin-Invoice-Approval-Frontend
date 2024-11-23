@@ -153,7 +153,7 @@ const ApprovedList = () => {
               <Button
                 type="text"
                 icon={<RightCircleOutlined />}
-                onClick={() => navigate("/listingTest")}
+                onClick={() => navigate("/listing")}
                 size="small"
               >
                 Listing Page
