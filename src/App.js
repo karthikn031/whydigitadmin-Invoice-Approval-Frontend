@@ -15,8 +15,8 @@ function App() {
         <Route path="/listing" element={<ListingPage />} />
         <Route path="/approvedlist" element={<ApprovedList />} />
         <Route path="/authenticate" element={<ConfirmationPage />} />
-        <Route path="/ListingTest" element={<ListingTest />} />
-        <Route path="/ApprovedTest" element={<ApprovedTest />} />
+        {/* <Route path="/ListingTest" element={<ListingTest />} />
+        <Route path="/ApprovedTest" element={<ApprovedTest />} /> */}
       </Routes>
     </Router>
   );
