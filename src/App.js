@@ -4,8 +4,6 @@ import ConfirmationPage from "./components/ConfirmationPage";
 import ListingPage from "./components/ListingPage";
 import LoginPage from "./components/LoginPage";
 import ApprovedList from "./components/ApprovedList";
-import ListingTest from "./components/ListingTest";
-import ApprovedTest from "./components/ApprovedTest";
 
 function App() {
   return (
@@ -15,8 +13,6 @@ function App() {
         <Route path="/listing" element={<ListingPage />} />
         <Route path="/approvedlist" element={<ApprovedList />} />
         <Route path="/authenticate" element={<ConfirmationPage />} />
-        {/* <Route path="/ListingTest" element={<ListingTest />} />
-        <Route path="/ApprovedTest" element={<ApprovedTest />} /> */}
       </Routes>
     </Router>
   );
