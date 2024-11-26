@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { encryptPassword } from "../utils/passEnc";
 import logo from "../logo.png";
-import logoonly from "../logoonly.jpg";
+import logoonly from "../logoonly.png";
 import { SunOutlined, MoonOutlined } from "@ant-design/icons";
 import './style.css';
 import './logintest1.css';
@@ -88,9 +88,18 @@ useEffect(() => {
         newPasscode[index - 1] = "";
         setPasscode(newPasscode);
         document.getElementById(`otp-${index - 1}`).focus();
+        handleSubmit();
       }
     }
   };
+
+
+    // Automatically trigger login when passcode and username are valid
+    useEffect(() => {
+      if (username && passcode.join("").length === 6) {
+        handleSubmit();
+      }
+    }, [username, passcode]);
 
   const handleSubmit = async () => {
     if (!username) {
@@ -127,8 +136,11 @@ useEffect(() => {
 
         const email = response.data.paramObjectsMap?.userVO?.email;
         localStorage.setItem("email", email );
+        
+        
 
         navigate("/listing");
+        
       } else {
         setError("Login failed. Please try again.");
       }
@@ -142,6 +154,8 @@ useEffect(() => {
       setLoading(false);
     }
   };
+
+  
 
   // Toggle Theme
   const toggleTheme = () => {
@@ -239,7 +253,7 @@ useEffect(() => {
         // color: '#131313',
         color: '#00008B',
   backgroundcolor: '#e7e5e4',
-  letterspacing: '.15em',
+  letterspacing: '.12em',
         textShadow: `
           1px -1px 0 #767676, -1px 2px 1px #737272, -2px 4px 1px #767474, -3px 6px 1px #787777, -4px 8px 1px #7b7a7a, -5px 10px 1px #7f7d7d, -6px 12px 1px #828181, -7px 14px 1px #868585, -8px 16px 1px #8b8a89, -9px 18px 1px #8f8e8d, -10px 20px 1px #949392, -11px 22px 1px #999897, -12px 24px 1px #9e9c9c, -13px 26px 1px #a3a1a1, -14px 28px 1px #a8a6a6, -15px 30px 1px #adabab, -16px 32px 1px #b2b1b0, -17px 34px 1px #b7b6b5, -18px 36px 1px #bcbbba, -19px 38px 1px #c1bfbf, -20px 40px 1px #c6c4c4, -21px 42px 1px #cbc9c8, -22px 44px 1px #cfcdcd, -23px 46px 1px #d4d2d1, -24px 48px 1px #d8d6d5, -25px 50px 1px #dbdad9, -26px 52px 1px #dfdddc, -27px 54px 1px #e2e0df, -28px 56px 1px #e4e3e2`,
       };
@@ -339,18 +353,20 @@ useEffect(() => {
 
         {/* <img src={butterfly}></img> */}
 
-        {/* <img src={logoonly} width="400"  ></img> <br/> */}
+        
+        
+        {/* <br/> */}
+        
 
 
-        {/* <h2 style={{  ...baseStyle,...elegantShadowStyle,}}> */}
-          
-          {/* Uniworld <br/>
+        <h2 style={{ ...baseStyle,...elegantShadowStyle}}>
+        {/* <img src={logoonly} width="200" ></img>   
+          Uniworld <br/>
           Logistics */}
           
   {/* <span>Uniworld</span> <br/>
   <span>Logistics</span> */}
-{/* </h2> */}
-  
+</h2>
 
 
       </div>
@@ -376,6 +392,7 @@ useEffect(() => {
               // fontSize: 20,
               // textAlign: "center",
               color: cardStyle.color,
+              
             }}
           >
     {/* <h1>Uniworld<br/><span style={{background:"white"}}>Welcome!!!</span></h1>         */}
@@ -383,8 +400,9 @@ useEffect(() => {
      {/* style={{ ...baseStyle, ...elegantShadowStyle }}>Welcome To <br/> UGS */}
             {/* Welcome!!!  */}
 
-            <div><h2 style={{
+            <h3 style={{
               ...retroshadowStyle,
+              
               // margin: 'auto',
               // fontsize: '50px',
               // textShadow: `
@@ -392,10 +410,20 @@ useEffect(() => {
               // 0px 14px 10px rgba(0, 0, 0, 0.15),
               // 0px 24px 2px rgba(0, 0, 0, 0.1), 
               // 0px 24px 30px rgba(0, 0, 0, 0.1)`
-            }}>Welcome To <br/> UGS</h2> </div> <br/>
-        
+              
+            }}> </h3>  
+
+<div class="square">
+  <p class="square__text">
+    {/* <span class="square__text__gradient"> */}
+    Welcome To UGS
+    {/* </span> */}
+  </p>
+</div>
+           
    
           </Text>
+          
         }
         style={{
           borderRadius: 12,
@@ -451,7 +479,7 @@ useEffect(() => {
                 value={digit}
                 maxLength={1}
                 onChange={(e) => handleChange(e.target.value, index)}
-                onKeyDown={(e) => handleKeyDown(e, index)}
+                onKeyDown={(e) => handleKeyDown(e, index)} 
                 style={{
                   width: "40px",
                   height: "40px",
@@ -464,7 +492,7 @@ useEffect(() => {
             ))}
           </Space>
 
-          <Button
+          {/* <Button
             type="primary"
             size="large"
             block
@@ -479,7 +507,7 @@ useEffect(() => {
             }}
           >
             Login
-          </Button>
+          </Button> */}
 
           {/* Dark Mode Toggle */}
           <Button
