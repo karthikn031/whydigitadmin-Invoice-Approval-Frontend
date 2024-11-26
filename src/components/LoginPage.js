@@ -137,6 +137,8 @@ useEffect(() => {
         const email = response.data.paramObjectsMap?.userVO?.email;
         localStorage.setItem("email", email );
         
+        const nickName = response.data.paramObjectsMap?.userVO?.nickName;
+        localStorage.setItem("nickName", nickName );
         
 
         navigate("/listing");

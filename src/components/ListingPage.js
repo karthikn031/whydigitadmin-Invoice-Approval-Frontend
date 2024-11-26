@@ -19,13 +19,15 @@ import {
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getListingData } from "../services/api"; // mock API call
+import { getListingData,getUserInfo } from "../services/api"; // mock API call
 import EmailConfig from "../utils/emailConfig";
 import NoDataFallback from "../utils/fallBack";
 import './style.css';
 import './date.css';
+// import './welcome.css';
 
 import confetti from 'canvas-confetti';
+import dayjs from 'dayjs';
 
 
 const { Option } = Select;
@@ -39,6 +41,7 @@ const ListingPage = () => {
   const [emailData, setEmailData] = useState([]);
   const [userType, setUserType] = useState(localStorage.getItem("userType"));
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const nickName = useState(localStorage.getItem("nickName"));
   const [filter, setFilter] = useState({
     name: "",
     amount: null,
@@ -52,6 +55,8 @@ const ListingPage = () => {
 
   
   const loginemail = localStorage.getItem("email");
+
+
 
 
   const currentHour = new Date().getHours();
@@ -70,7 +75,6 @@ const ListingPage = () => {
 
 
   useEffect(() => {
-    
     getListingData()
       .then((response) => {
         setData(response);
@@ -83,6 +87,8 @@ const ListingPage = () => {
         });
         setLoading(false);
       });
+      
+      
   }, []);
 
   useEffect(() => {
@@ -106,6 +112,8 @@ const ListingPage = () => {
         });
         setLoading(false);
       });
+    
+
   };
 
   const toggleTheme = () => {
@@ -255,6 +263,7 @@ const ListingPage = () => {
     token: {
       // colorPrimary: '#1890ff', // Adjust as needed for dark mode
       colorPrimary: '#5D576B',
+// 
       // colorBgBase: '#1c1c1c', // Dark background
       colorBgBase: '#5D576B',
       colorTextBase: '#fff', // White text for dark mode
@@ -315,8 +324,8 @@ const toInitCap = (str) => {
   const updateDate = () => {
     let today = new Date();
     const months = [
-      "January", "February", "March", "April", "May", "June", 
-      "July", "August", "September", "October", "November", "December"
+      "01", "02", "03", "04", "05", "06", 
+      "07", "08", "09", "10", "11", "12"
     ];
     const dayWeek = [
       "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", 
@@ -327,7 +336,7 @@ const toInitCap = (str) => {
       day: dayWeek[today.getDay()],
       dayNum: today.getDate(),
       month: months[today.getMonth()],
-      year: today.getFullYear()
+      year: today.getFullYear(),
     });
   };
 
@@ -343,7 +352,31 @@ const toInitCap = (str) => {
     return () => clearInterval(timeInterval);
   }, []);
 
+  const DateTimeContainer = ()=> ({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    padding: theme.spacing(2)
+  });
   
+  
+  
+  
+  const CalendarTimeDisplay = () => {
+    const [currentDate, setCurrentDate] = useState(dayjs().format('DD/MM/YYYY'));
+    const [currentTime, setCurrentTime] = useState(dayjs().format('HH:mm:ss'));
+  
+    useEffect(() => {
+      const intervalId = setInterval(() => {
+        setCurrentDate(dayjs().format('DD-MM-YYYY'));
+        setCurrentTime(dayjs().format('HH:mm:ss'));
+      }, 1000);
+  
+      return () => clearInterval(intervalId);
+    }, []);
+
+  }
 
   return (
     <ConfigProvider theme={themeConfig}> {/* Wrap entire component with ConfigProvider */}
@@ -355,7 +388,7 @@ const toInitCap = (str) => {
             <Card
               title="Filters"
               bordered={false}
-              size="small"
+              size="large"
               style={{
                 borderRadius: "8px",
                 boxShadow: boxShadowStyle, // Apply custom box shadow
@@ -375,32 +408,37 @@ const toInitCap = (str) => {
               }}
               
             >
-              <Space direction="vertical" size="small" style={{ width: "100%" }}>
+              <Space direction="vertical" size="small" style={{ width: "100%", }}>
                 <Input
                   name="name"
                   value={filter.name}
                   onChange={handleFilterChange}
                   placeholder="Filter by Name"
-                 
-                />
+                  className={theme === "dark" ? "custom-placeholder-dark" : "custom-placeholder-light"}  // Apply class based on theme
+                  />
                 <Input
                   name="amount"
                   value={filter.amount}
                   onChange={handleFilterChange}
                   placeholder="Filter by Amount"
                   type="number"
+                  className={theme === "dark" ? "custom-placeholder-dark" : "custom-placeholder-light"}  // Apply class based on theme
                 />
                <RangePicker
                   value={[filter.startDate, filter.endDate]} 
                   onChange={handleDateRangeChange} 
                   format="YYYY-MM-DD"
                   placeholder={['Start Date', 'End Date']}
+                  className={theme === "dark" ? "custom-placeholder-dark" : "custom-placeholder-light"}  // Apply class based on theme
                 />
-                <Button
+                <br/>
+                <Button 
                   type="text"
                   icon={<RightCircleOutlined />}
                   onClick={approvedList}
                   size="small"
+                  style={{ fontSize: '20px', fontWeight: 'bold' }} 
+                  
                 >
                   Approved List
                 </Button>
@@ -409,46 +447,49 @@ const toInitCap = (str) => {
             </Card>
 
 <br/>
-            <Card
-              // title="Filters"
+            <Card 
+              
               bordered={false}
               size="small"
               style={{
                 borderRadius: "8px",
                 boxShadow: boxShadowStyle, // Apply custom box shadow
                 border: `1px solid ${cardBorderColor}`, // Apply the border color here
-                  //  textalign: "center",
-                   padding: "40px",
-                   // background: "skyblue",
-                   color: "#fff",
-                   boxshadow: "0 4px 15px rgba(0, 0, 0, 0.3)",
-                   color: "#000", 
-                   fontWeight: "bold",
-                   background: "white",
-                  //  fontSize:"10px"
+                fontSize:'20px',
+                fontWeight: 'bold'
                 // color: "white",
-                // background: "skyblue"
               }}
               
             >
                 {/* <div>{getGreeting()}!!!  Mr. {toInitCap(loginemail.split('@')[0])} </div> <br/> */}
-                <br/>
-      <div className="cont">
+                {/* <br/> */}
+      {/* <div className="cont"> */}
+      {/* <div id="clockface" >{getGreeting()}!!! <br/> Mr. {toInitCap(loginemail.split('@')[0])} </div> <br/>  */}
+      {/* <div id="clockface" className="shadow">Welcome {toInitCap(loginemail.split('@')[0])} </div> <br/>
         <div id="clockface" className="shadow">{date.day},</div>
         <div id="clockface">{date.dayNum}  {date.month} {date.year} </div>
-      <div id="clockface" >{time}</div>
-      </div> 
+      <div id="clockface" >{time}</div> */}
+      {/* </div>  */}
 
       
-      
-    
-    
+      <div className="cont">
+        <div id="clockface" >
+        {/* <span class="square__text__gradient"> */}
 
-          
+      {/* <div id="clockface" >{getGreeting()}!!! <br/> Mr. {toInitCap(loginemail.split('@')[0])} </div> <br/>  */}
+      Welcome!!! {nickName}  <br/><br/>
+        {date.day}, <br/>
+        {date.dayNum}/{date.month}/{date.year}  <br/>
+      {time}
+      {/* </span> */}
+      </div>
+      </div>    
+
+
             </Card>
           </Col>
+      
 
-          
           
           {/* Listing Section */}
           <Col xs={24} sm={16} md={18} lg={19}>
@@ -476,6 +517,15 @@ const toInitCap = (str) => {
                   </Text> */}
 
 <p>Invoice Requests</p>
+{/* 
+<div class="square">
+  <p class="square__text">
+    
+    <span class="square__text__gradient">
+    Invoice Requests
+    </span>
+  </p>
+</div> */}
 
 
 
