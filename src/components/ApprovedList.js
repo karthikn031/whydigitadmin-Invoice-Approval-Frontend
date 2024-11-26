@@ -25,6 +25,8 @@ const ApprovedList = () => {
   const navigate = useNavigate();
   const { RangePicker } = DatePicker; // Destructure RangePicker
 
+  const loginemail = localStorage.getItem("email");
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -112,6 +114,68 @@ const ApprovedList = () => {
   // const cardBorderColor = theme === "dark" ? "white" : "#d9d9d9";
   const cardBorderColor = theme === "dark" ? "#444" : "#d9d9d9";
 
+
+  
+  const [time, setTime] = useState('');
+  const [date, setDate] = useState({
+    day: '',
+    dayNum: '',
+    month: '',
+    year: ''
+  });
+
+  // Function to show time
+  const showTime = () => {
+    let time = new Date();
+    setTime(time.toLocaleTimeString("en-US", { hour12: false }));
+  };
+
+  const updateDate = () => {
+    let today = new Date();
+    const months = [
+      "01", "02", "03", "04", "05", "06", 
+      "07", "08", "09", "10", "11", "12"
+    ];
+    const dayWeek = [
+      "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", 
+      "Friday", "Saturday"
+    ];
+
+    setDate({
+      day: dayWeek[today.getDay()],
+      dayNum: today.getDate(),
+      month: months[today.getMonth()],
+      year: today.getFullYear(),
+    });
+  };
+
+  // Use useEffect to update time and date on mount and every second
+  useEffect(() => {
+    showTime(); // Set initial time
+    updateDate(); // Set initial date
+
+    // Set interval to update time every second
+    const timeInterval = setInterval(showTime, 1000);
+
+    // Clean up interval when the component unmounts
+    return () => clearInterval(timeInterval);
+  }, []);
+
+  const DateTimeContainer = ()=> ({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    padding: theme.spacing(2)
+  });
+
+  const toInitCap = (str) => {
+    return str
+      .split('.')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join('.');
+  };
+
   return (
 
     <ConfigProvider theme={themeConfig}>
@@ -122,7 +186,7 @@ const ApprovedList = () => {
           <Card
             title="Filters"
             bordered={false}
-            size="small"
+            size="large"
             style={{
               borderRadius: "8px",
               boxShadow: boxShadowStyle,
@@ -130,12 +194,14 @@ const ApprovedList = () => {
               
             }}
           >
-            <Space direction="vertical" size="small" style={{ width: "100%" }}>
+            <Space direction="vertical" size="small" style={{ width: "100%" 
+            }}>
               <Input
                 name="name"
                 value={filter.name}
                 onChange={handleFilterChange}
                 placeholder="Filter by Name"
+                className={theme === "dark" ? "custom-placeholder-dark" : "custom-placeholder-light"}  // Apply class based on theme
               />
               <Input
                 name="amount"
@@ -143,24 +209,72 @@ const ApprovedList = () => {
                 onChange={handleFilterChange}
                 placeholder="Filter by Amount"
                 type="number"
+                className={theme === "dark" ? "custom-placeholder-dark" : "custom-placeholder-light"}  // Apply class based on theme
               />
               <RangePicker
                 value={[filter.startDate, filter.endDate]} 
                 onChange={handleDateRangeChange} 
                 format="YYYY-MM-DD"
                 placeholder={['Start Date', 'End Date']}
+                className={theme === "dark" ? "custom-placeholder-dark" : "custom-placeholder-light"}  // Apply class based on theme
               />
+              <br/>
               <Button
                 type="text"
                 icon={<RightCircleOutlined />}
                 onClick={() => navigate("/listing")}
                 size="small"
+                style={{ fontSize: '20px', fontWeight: 'bold' }} 
+                
               >
                 Listing Page
               </Button>
             </Space>
           </Card>
-        </Col>
+        
+
+        <br/>
+        
+            <Card 
+              
+              bordered={false}
+              size="small"
+              style={{
+                borderRadius: "8px",
+                boxShadow: boxShadowStyle, // Apply custom box shadow
+                border: `1px solid ${cardBorderColor}`, // Apply the border color here
+                fontSize:'20px',
+                fontWeight: 'bold'
+                // color: "white",
+              }}
+              
+            >
+                {/* <div>{getGreeting()}!!!  Mr. {toInitCap(loginemail.split('@')[0])} </div> <br/> */}
+                {/* <br/> */}
+      {/* <div className="cont"> */}
+      {/* <div id="clockface" >{getGreeting()}!!! <br/> Mr. {toInitCap(loginemail.split('@')[0])} </div> <br/>  */}
+      {/* <div id="clockface" className="shadow">Welcome {toInitCap(loginemail.split('@')[0])} </div> <br/>
+        <div id="clockface" className="shadow">{date.day},</div>
+        <div id="clockface">{date.dayNum}  {date.month} {date.year} </div>
+      <div id="clockface" >{time}</div> */}
+      {/* </div>  */}
+
+      
+      <div className="cont">
+        <div id="clockface">
+        {/* <span class="square__text__gradient"> */}
+      {/* <div id="clockface" >{getGreeting()}!!! <br/> Mr. {toInitCap(loginemail.split('@')[0])} </div> <br/>  */}
+      Welcome!!! {toInitCap(loginemail.split('@')[0])}  <br/><br/>
+        {date.day}, <br/>
+        {date.dayNum}/{date.month}/{date.year}  <br/>
+      {time}
+      {/* </span> */}
+      </div>
+      </div>    
+            </Card>
+          </Col>
+      
+
 
         {/* Listing Section */}
         <Col xs={24} sm={16} md={18} lg={19}>
@@ -178,6 +292,8 @@ const ApprovedList = () => {
                 {/* <Text strong style={{ fontSize: '20px' }}>Approved Lists</Text> */}
 
                 <p>Approved Lists</p>
+
+
                 
                 <div>
                   
