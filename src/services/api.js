@@ -5,7 +5,9 @@ const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8091";
 export const getListingData = async () => {
   try {
     const response = await axios.get(
-      `${API_URL}/api/InvoiceApproval/getPendingDetails?userType=${localStorage.getItem("userType")}`
+      `${API_URL}/api/InvoiceApproval/getPendingDetails?userType=${localStorage.getItem(
+        "userType"
+      )}&userName=${localStorage.getItem("userName")}`
     ); // Replace `/your-api-endpoint` with the actual endpoint path
     if (
       response.data.status &&
@@ -34,12 +36,12 @@ export const getListingData = async () => {
   }
 };
 
-
-
 export const getInvDetailsApprove1 = async () => {
   try {
     const response = await axios.get(
-      `${API_URL}/api/InvoiceApproval/getInvDetailsApprove1?userType=${localStorage.getItem("userType")}`
+      `${API_URL}/api/InvoiceApproval/getInvDetailsApprove1?userType=${localStorage.getItem(
+        "userType"
+      )}&userName=${localStorage.getItem("userName")}`
     ); // Replace `/your-api-endpoint` with the actual endpoint path
     if (
       response.data.status &&
@@ -57,8 +59,8 @@ export const getInvDetailsApprove1 = async () => {
           creditLimit: item.creditLimit,
           outStanding: item.outStanding,
           id: item.gstInvoiceHdrId,
-          approved1on : item.approve1on,
-          approved2on : item.approve2on
+          approved1on: item.approve1on,
+          approved2on: item.approve2on,
         })
       );
     } else {
