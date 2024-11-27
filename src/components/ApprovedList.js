@@ -15,7 +15,7 @@ import {
   Row,
   Space,
   Spin,
-  Typography,
+  Typography,  Popover,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -142,6 +142,11 @@ const ApprovedList = () => {
     year: "",
   });
 
+  const Listing = () => {
+    navigate("/Listing"); // Navigate to the approved list page
+  };
+
+
   // Function to show time
   const showTime = () => {
     let time = new Date();
@@ -194,12 +199,47 @@ const ApprovedList = () => {
     return () => clearInterval(timeInterval);
   }, []);
 
+  const popoverContent = (
+    <Space
+      direction="vertical"
+      size="middle"
+      style={{
+        width: "100%",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+      }}
+    >
+      <Input
+        name="name"
+        value={filter.name}
+        onChange={handleFilterChange}
+        placeholder="Filter by Name"
+        style={{ width: "200px" }}
+      />
+      <Input
+        name="amount"
+        value={filter.amount}
+        onChange={handleFilterChange}
+        placeholder="Filter by Amount"
+        type="number"
+        style={{ width: "200px" }}
+      />
+      <RangePicker
+        value={[filter.startDate, filter.endDate]}
+        onChange={handleDateRangeChange}
+        format="YYYY-MM-DD"
+        placeholder={["Start Date", "End Date"]}
+        style={{ width: "200px" }}
+      />
+    </Space>
+  );
+
   return (
     <ConfigProvider theme={themeConfig}>
-      <div style={{ padding: "20px", marginTop: "30px" }}>
+      <div style={{ padding: "20px", marginTop: "40px" }}>
         <Row gutter={[16, 16]}>
           {/* Filter Section */}
-          <Col xs={24} sm={8} md={6} lg={5}>
+          {/* <Col xs={24} sm={8} md={6} lg={5}>
             <Card
               title="Filters"
               bordered={false}
@@ -261,7 +301,7 @@ const ApprovedList = () => {
                 </Button>
               </Space>
             </Card>
-          </Col>
+          </Col> */}
 
           {/* Listing Section */}
           <Col xs={24} sm={16} md={18} lg={19}>
@@ -290,14 +330,33 @@ const ApprovedList = () => {
                     >
                       {theme === "light" ? "Dark Mode" : "Light Mode"}
                     </Button>
-                    <Button
-                      type="text"
-                      icon={<LogoutOutlined />}
-                      onClick={handleLogout}
-                      size="small"
+                  
+                    <Popover
+                      content={popoverContent}
+                      title="Filter"
+                      trigger="click"
+                      placement="bottomLeft"
+                      style={{ marginLeft: "10px" }}
                     >
-                      Logout
-                    </Button>
+                      <Button
+                        type="text"
+                        icon={<LogoutOutlined />}
+                        size="small"
+                      >
+                        Filter
+                      </Button>
+                      <Button
+                        type="text"
+                        icon={<RightCircleOutlined />}
+                        onClick={Listing}
+                        size="small"
+                        style={{ alignSelf: "center" }}
+                      >
+                        Listing
+                      </Button>
+                    </Popover>
+
+                  
                   </div>
                 </div>
               }

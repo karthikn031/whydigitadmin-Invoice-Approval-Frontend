@@ -10,10 +10,12 @@ import {
 import React, { useEffect, useState } from "react";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
+import { useNavigate } from "react-router-dom";
 
 const Overview = ({ userName = "User" }) => {
   const [showConfetti, setShowConfetti] = useState(true);
   const { width, height } = useWindowSize(); // Automatically adjusts confetti to window size
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Stop confetti after 5 seconds
@@ -23,6 +25,11 @@ const Overview = ({ userName = "User" }) => {
 
     return () => clearTimeout(timer); // Clean up timer on unmount
   }, []);
+
+  const Listing = () => {
+    navigate("/Listing"); // Navigate to the approved list page
+  };
+
 
   return (
     <Box
@@ -102,6 +109,7 @@ const Overview = ({ userName = "User" }) => {
               <Button
                 variant="outlined"
                 size="small"
+                onClick={Listing}
                 sx={{
                   borderColor: "#FF5722",
                   color: "#FF5722",
