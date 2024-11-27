@@ -1,6 +1,5 @@
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import BarChartIcon from "@mui/icons-material/BarChart";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import MenuIcon from "@mui/icons-material/Menu";
 import {
@@ -34,27 +33,30 @@ const Sidebar = () => {
     { text: "Overview", icon: <DashboardIcon />, path: "/overview" },
     { text: "Reports", icon: <BarChartIcon />, path: "/reports" },
     { text: "Listing", icon: <AccountCircleIcon />, path: "/listing" },
+    {
+      text: "Approved List",
+      icon: <AccountCircleIcon />,
+      path: "/ApprovedList",
+    },
   ];
 
   return (
-    <Box sx={{ display: "flex", height: "100vh", backgroundColor: "#1976d2" }}>
+    <Box sx={{ display: "flex", height: "100vh", backgroundColor: "#FCE212" }}>
       {/* Toggle Button */}
       <IconButton
         onClick={toggleDrawer}
         sx={{
           position: "fixed",
           top: 13,
-          left: open ? drawerWidth - 50 : 10,
+          left: open ? 10 : 10,
           zIndex: 1201,
-          backgroundColor: "#FFFFFF",
-          color: "#6c63ff",
-          //   boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-          //   "&:hover": { backgroundColor: "#6c63ff", color: "#fff" },
+          backgroundColor: "#FCE212",
+          color: "#ffffff",
           borderRadius: "50%",
           transition: "all 0.3s ease-in-out",
         }}
       >
-        {open ? <ChevronLeftIcon /> : <MenuIcon />}
+        {open ? <MenuIcon /> : <MenuIcon />}
       </IconButton>
 
       {/* Sidebar Drawer */}
@@ -67,7 +69,7 @@ const Sidebar = () => {
           "& .MuiDrawer-paper": {
             width: open ? drawerWidth : 80,
             boxSizing: "border-box",
-            background: "linear-gradient(45deg, #6c63ff, #3a47d5)",
+            background: "#212F3C",
             color: "#FFFFFF",
             transition: "width 0.3s ease-in-out",
             borderRight: "none",
@@ -104,25 +106,30 @@ const Sidebar = () => {
                 sx={{
                   marginBottom: 1,
                   borderRadius: "12px",
+                  color:
+                    location.pathname === item.path ? "#000000" : "#FFFFFF",
                   backgroundColor:
-                    location.pathname === item.path
-                      ? "rgba(255, 255, 255, 0.3)"
-                      : "transparent",
+                    location.pathname === item.path ? "#FCE212" : "transparent",
                   boxShadow:
                     location.pathname === item.path
                       ? "0px 4px 8px rgba(0, 0, 0, 0.2)"
                       : "none",
                   transition: "all 0.3s ease-in-out",
                   "&:hover": {
-                    backgroundColor: "rgba(255, 255, 255, 0.3)",
+                    backgroundColor: "#FCE212",
                     transform: "scale(1.05)",
+                    color: "#000000", // Ensures text turns black on hover
                   },
                 }}
               >
                 <ListItemIcon
                   sx={{
                     minWidth: open ? 40 : "auto",
-                    color: "#FFFFFF",
+                    color:
+                      location.pathname === item.path ? "#000000" : "#FFFFFF",
+                    "&:hover": {
+                      color: "#000000", // Turns icon black on hover
+                    },
                   }}
                 >
                   {item.icon}
@@ -134,7 +141,13 @@ const Sidebar = () => {
                       "& .MuiTypography-root": {
                         fontSize: "1rem",
                         fontWeight: "500",
-                        color: "#FFFFFF",
+                        color:
+                          location.pathname === item.path
+                            ? "#000000"
+                            : "#FFFFFF", // Text color
+                        "&:hover": {
+                          color: "#000000", // Turns text black on hover
+                        },
                       },
                     }}
                   />

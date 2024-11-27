@@ -51,7 +51,7 @@ const Header = () => {
       position="fixed"
       sx={{
         zIndex: (theme) => theme.zIndex.drawer + 1,
-        backgroundColor: "linear-gradient(45deg, #6c63ff, #3a47d5)", // Custom AppBar color
+        backgroundColor: "#1B2631", // Custom AppBar color
       }}
     >
       <Toolbar>
@@ -61,7 +61,7 @@ const Header = () => {
           component="div"
           sx={{
             flexGrow: 1,
-            marginLeft: 4,
+            marginLeft: 7,
             fontFamily: "'Poppins', sans-serif",
             fontWeight: "bold",
             letterSpacing: "2px",
@@ -90,7 +90,7 @@ const Header = () => {
             onClick={handlePopoverOpen}
             style={{ cursor: "pointer" }}
           >
-            {localStorage.getItem("userName")}{" "}
+            {localStorage.getItem("nickName")}{" "}
             {/* Replace with actual user's name */}
           </Typography>
         </Box>
