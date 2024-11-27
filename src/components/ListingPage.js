@@ -1,34 +1,36 @@
-import { LogoutOutlined, RightCircleOutlined, SunOutlined, MoonOutlined } from "@ant-design/icons";
+import {
+  LogoutOutlined,
+  MoonOutlined,
+  RightCircleOutlined,
+  SunOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Card,
-  Checkbox,
   Col,
+  ConfigProvider,
+  DatePicker,
   Descriptions,
   Input,
   Modal,
   notification,
+  Popover,
   Row,
   Select,
   Space,
   Spin,
   Typography,
-  ConfigProvider,
-  Switch,DatePicker
 } from "antd";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getListingData,getUserInfo } from "../services/api"; // mock API call
+import { getListingData } from "../services/api"; // mock API call
 import EmailConfig from "../utils/emailConfig";
 import NoDataFallback from "../utils/fallBack";
-import './style.css';
-import './date.css';
-// import './welcome.css';
+import "./date.css";
+import "./style.css";
 
-import confetti from 'canvas-confetti';
-import dayjs from 'dayjs';
-
+import confetti from "canvas-confetti";
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -41,38 +43,41 @@ const ListingPage = () => {
   const [emailData, setEmailData] = useState([]);
   const [userType, setUserType] = useState(localStorage.getItem("userType"));
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
-  const nickName = useState(localStorage.getItem("nickName"));
   const [filter, setFilter] = useState({
     name: "",
-    amount: null,
-    currency: "",
+    amount: "",
+    startDate: null,
+    endDate: null,
   });
   const [selectedItem, setSelectedItem] = useState(null); // Modal data
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const navigate = useNavigate();
   const { RangePicker } = DatePicker; // Destructure RangePicker
 
-  
   const loginemail = localStorage.getItem("email");
-
-
-
 
   const currentHour = new Date().getHours();
 
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilter((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const getGreeting = () => {
     if (currentHour < 12) {
-      return 'Good Morning';
+      return "Good Morning";
     } else if (currentHour < 18) {
-      return 'Good Afternoon';
+      return "Good Afternoon";
     } else {
-      return 'Good Evening';
+      return "Good Evening";
     }
-  }
+  };
 
   // Determine the greeting based on the time of day
-
 
   useEffect(() => {
     getListingData()
@@ -87,16 +92,11 @@ const ListingPage = () => {
         });
         setLoading(false);
       });
-      
-      
   }, []);
 
   useEffect(() => {
     fetchData();
   }, []);
-
-
- 
 
   const fetchData = () => {
     setLoading(true);
@@ -112,8 +112,6 @@ const ListingPage = () => {
         });
         setLoading(false);
       });
-    
-
   };
 
   const toggleTheme = () => {
@@ -168,7 +166,6 @@ const ListingPage = () => {
         }
         fetchData();
         setIsModalOpen(false);
-        
       } else {
         notification.error({
           message: `Item ${item.id} failed`,
@@ -223,16 +220,6 @@ const ListingPage = () => {
     navigate("/ApprovedList"); // Navigate to the approved list page
   };
 
-  
-
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilter((prevFilter) => ({
-      ...prevFilter,
-      [name]: value,
-    }));
-  };
-
   const handleCardClick = (item) => {
     setSelectedItem(item);
     setIsModalOpen(true);
@@ -244,50 +231,55 @@ const ListingPage = () => {
       startDate: dates ? dates[0] : null,
       endDate: dates ? dates[1] : null,
     }));
-
-    
   };
 
- // Filter the data by date range, name, amount, and currency
- const filteredData = data.filter(
-  (item) =>
-    (filter.name === "" || item.name.toLowerCase().includes(filter.name.toLowerCase())) &&
-    (filter.amount === null || item.amount.includes(filter.amount)) &&
-    (filter.currency === "" || item.currency.toLowerCase().includes(filter.currency.toLowerCase())) &&
-    // Date filter logic
-    (!filter.startDate || new Date(item.docDate) >= new Date(filter.startDate)) &&
-    (!filter.endDate || new Date(item.docDate) <= new Date(filter.endDate))
-);
+  // Filter the data by date range, name, amount, and currency
+  // const filteredData = data.filter(
+  //   (item) =>
+  //     (filter.name === "" ||
+  //       item.name.toLowerCase().includes(filter.name.toLowerCase())) &&
+  //     (filter.amount === null || item.amount.includes(filter.amount)) &&
+  //     (filter.currency === "" ||
+  //       item.currency.toLowerCase().includes(filter.currency.toLowerCase())) &&
+  //     // Date filter logic
+  //     (!filter.startDate ||
+  //       new Date(item.docDate) >= new Date(filter.startDate)) &&
+  //     (!filter.endDate || new Date(item.docDate) <= new Date(filter.endDate))
+  // );
 
-  const themeConfig = theme === "dark" ? {
-    token: {
-      // colorPrimary: '#1890ff', // Adjust as needed for dark mode
-      colorPrimary: '#5D576B',
-// 
-      // colorBgBase: '#1c1c1c', // Dark background
-      colorBgBase: '#5D576B',
-      colorTextBase: '#fff', // White text for dark mode
-      // colorTextBase: 'black',
-      colorLink: '#40a9ff', // Link color for dark mode
-    }
-  } : {};
+  const filteredData = [];
+
+  const themeConfig =
+    theme === "dark"
+      ? {
+          token: {
+            // colorPrimary: '#1890ff', // Adjust as needed for dark mode
+            colorPrimary: "#5D576B",
+            // colorBgBase: '#1c1c1c', // Dark background
+            colorBgBase: "#5D576B",
+            colorTextBase: "#fff", // White text for dark mode
+            // colorTextBase: 'black',
+            colorLink: "#40a9ff", // Link color for dark mode
+          },
+        }
+      : {};
   // Define styles based on dark mode
-  const boxShadowStyle = theme === "dark" ? "0 2px 8px rgba(0, 0, 0, 0.15)" : "0 2px 8px rgba(0, 0, 0, 0.1)";
+  const boxShadowStyle =
+    theme === "dark"
+      ? "0 2px 8px rgba(0, 0, 0, 0.15)"
+      : "0 2px 8px rgba(0, 0, 0, 0.1)";
   // const cardBorderColor = theme === "dark" ? "white" : "#d9d9d9"; // White border in dark mode
 
+  // Dynamic border color based on theme
+  const cardBorderColor = theme === "dark" ? "#444" : "#d9d9d9";
+  const inputBorderColor = theme === "dark" ? "#666" : "#d9d9d9";
 
-// Dynamic border color based on theme
-const cardBorderColor = theme === "dark" ? "#444" : "#d9d9d9";
-const inputBorderColor = theme === "dark" ? "#666" : "#d9d9d9";
-
-const toInitCap = (str) => {
-  return str
-    .split('.')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join('.');
-};
-
-
+  const toInitCap = (str) => {
+    return str
+      .split(".")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(".");
+  };
 
   const handleCelebrate = () => {
     // Trigger confetti
@@ -298,21 +290,21 @@ const toInitCap = (str) => {
     });
 
     // Button animation
-    const button = document.getElementById('celebrateBtn');
+    const button = document.getElementById("celebrateBtn");
     if (button) {
-      button.style.transform = 'scale(0.95)';
+      button.style.transform = "scale(0.95)";
       setTimeout(() => {
-        button.style.transform = 'scale(1)';
+        button.style.transform = "scale(1)";
       }, 100);
     }
-  }
+  };
 
-  const [time, setTime] = useState('');
+  const [time, setTime] = useState("");
   const [date, setDate] = useState({
-    day: '',
-    dayNum: '',
-    month: '',
-    year: ''
+    day: "",
+    dayNum: "",
+    month: "",
+    year: "",
   });
 
   // Function to show time
@@ -324,12 +316,27 @@ const toInitCap = (str) => {
   const updateDate = () => {
     let today = new Date();
     const months = [
-      "01", "02", "03", "04", "05", "06", 
-      "07", "08", "09", "10", "11", "12"
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
     const dayWeek = [
-      "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", 
-      "Friday", "Saturday"
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
     ];
 
     setDate({
@@ -352,147 +359,110 @@ const toInitCap = (str) => {
     return () => clearInterval(timeInterval);
   }, []);
 
-  const DateTimeContainer = ()=> ({
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    padding: theme.spacing(2)
-  });
-  
-  
-  
-  
-  const CalendarTimeDisplay = () => {
-    const [currentDate, setCurrentDate] = useState(dayjs().format('DD/MM/YYYY'));
-    const [currentTime, setCurrentTime] = useState(dayjs().format('HH:mm:ss'));
-  
-    useEffect(() => {
-      const intervalId = setInterval(() => {
-        setCurrentDate(dayjs().format('DD-MM-YYYY'));
-        setCurrentTime(dayjs().format('HH:mm:ss'));
-      }, 1000);
-  
-      return () => clearInterval(intervalId);
-    }, []);
-
-  }
+  const popoverContent = (
+    <Space
+      direction="vertical"
+      size="middle"
+      style={{
+        width: "100%",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+      }}
+    >
+      <Input
+        name="name"
+        value={filter.name}
+        onChange={handleFilterChange}
+        placeholder="Filter by Name"
+        style={{ width: "200px" }}
+      />
+      <Input
+        name="amount"
+        value={filter.amount}
+        onChange={handleFilterChange}
+        placeholder="Filter by Amount"
+        type="number"
+        style={{ width: "200px" }}
+      />
+      <RangePicker
+        value={[filter.startDate, filter.endDate]}
+        onChange={handleDateRangeChange}
+        format="YYYY-MM-DD"
+        placeholder={["Start Date", "End Date"]}
+        style={{ width: "200px" }}
+      />
+    </Space>
+  );
 
   return (
-    <ConfigProvider theme={themeConfig}> {/* Wrap entire component with ConfigProvider */}
-      <div style={{ padding: "20px" }}>
+    <ConfigProvider theme={themeConfig}>
+      {" "}
+      {/* Wrap entire component with ConfigProvider */}
+      <div style={{ padding: "20px", marginTop: "40px" }}>
         {/* Toggle Dark/Light Mode */}
         <Row gutter={[16, 16]}>
           {/* Filter Section */}
-          <Col xs={24} sm={8} md={6} lg={5}>
+          {/* <Col xs={24} sm={8} md={6} lg={5}>
             <Card
               title="Filters"
-              bordered={false}
-              size="large"
-              style={{
-                borderRadius: "8px",
-                boxShadow: boxShadowStyle, // Apply custom box shadow
-                border: `1px solid ${cardBorderColor}`, // Apply the border color here
-                color: "white",
-                
-
-                
-                // textalign: "center",
-                // padding: "40px",
-                // // background: "skyblue",
-                // color: "#fff",
-                // borderradius: "8px",
-                // boxshadow: "0 4px 15px rgba(0, 0, 0, 0.3)",
-                // color: "#000", 
-                // fontWeight: "bold"
-              }}
-              
-            >
-              <Space direction="vertical" size="small" style={{ width: "100%", }}>
-                <Input
-                  name="name"
-                  value={filter.name}
-                  onChange={handleFilterChange}
-                  placeholder="Filter by Name"
-                  className={theme === "dark" ? "custom-placeholder-dark" : "custom-placeholder-light"}  // Apply class based on theme
-                  />
-                <Input
-                  name="amount"
-                  value={filter.amount}
-                  onChange={handleFilterChange}
-                  placeholder="Filter by Amount"
-                  type="number"
-                  className={theme === "dark" ? "custom-placeholder-dark" : "custom-placeholder-light"}  // Apply class based on theme
-                />
-               <RangePicker
-                  value={[filter.startDate, filter.endDate]} 
-                  onChange={handleDateRangeChange} 
-                  format="YYYY-MM-DD"
-                  placeholder={['Start Date', 'End Date']}
-                  className={theme === "dark" ? "custom-placeholder-dark" : "custom-placeholder-light"}  // Apply class based on theme
-                />
-                <br/>
-                <Button 
-                  type="text"
-                  icon={<RightCircleOutlined />}
-                  onClick={approvedList}
-                  size="small"
-                  style={{ fontSize: '20px', fontWeight: 'bold' }} 
-                  
-                >
-                  Approved List
-                </Button>
-                
-              </Space>
-            </Card>
-
-<br/>
-            <Card 
-              
               bordered={false}
               size="small"
               style={{
                 borderRadius: "8px",
                 boxShadow: boxShadowStyle, // Apply custom box shadow
                 border: `1px solid ${cardBorderColor}`, // Apply the border color here
-                fontSize:'20px',
-                fontWeight: 'bold'
-                // color: "white",
+                color: "white",
+                padding: "10px",
               }}
-              
             >
-                {/* <div>{getGreeting()}!!!  Mr. {toInitCap(loginemail.split('@')[0])} </div> <br/> */}
-                {/* <br/> */}
-      {/* <div className="cont"> */}
-      {/* <div id="clockface" >{getGreeting()}!!! <br/> Mr. {toInitCap(loginemail.split('@')[0])} </div> <br/>  */}
-      {/* <div id="clockface" className="shadow">Welcome {toInitCap(loginemail.split('@')[0])} </div> <br/>
-        <div id="clockface" className="shadow">{date.day},</div>
-        <div id="clockface">{date.dayNum}  {date.month} {date.year} </div>
-      <div id="clockface" >{time}</div> */}
-      {/* </div>  */}
-
-      
-      <div className="cont">
-        <div id="clockface" >
-        {/* <span class="square__text__gradient"> */}
-
-      {/* <div id="clockface" >{getGreeting()}!!! <br/> Mr. {toInitCap(loginemail.split('@')[0])} </div> <br/>  */}
-      Welcome!!! {nickName}  <br/><br/>
-        {date.day}, <br/>
-        {date.dayNum}/{date.month}/{date.year}  <br/>
-      {time}
-      {/* </span> */}
-      </div>
-      </div>    
-
-
+              <Space
+                direction="horizontal" // Change to horizontal
+                size="middle" // Add spacing between items
+                style={{
+                  width: "100%",
+                  justifyContent: "space-between", // Adjust alignment
+                  flexWrap: "wrap", // Allow wrapping if items overflow
+                }}
+              >
+                <Input
+                  name="name"
+                  value={filter.name}
+                  onChange={handleFilterChange}
+                  placeholder="Filter by Name"
+                  style={{ width: "200px" }} // Adjust width if needed
+                />
+                <Input
+                  name="amount"
+                  value={filter.amount}
+                  onChange={handleFilterChange}
+                  placeholder="Filter by Amount"
+                  type="number"
+                  style={{ width: "200px" }} // Adjust width if needed
+                />
+                <RangePicker
+                  value={[filter.startDate, filter.endDate]}
+                  onChange={handleDateRangeChange}
+                  format="YYYY-MM-DD"
+                  placeholder={["Start Date", "End Date"]}
+                  style={{ width: "300px" }} // Adjust width for RangePicker
+                />
+                <Button
+                  type="text"
+                  icon={<RightCircleOutlined />}
+                  onClick={approvedList}
+                  size="small"
+                  style={{ alignSelf: "center" }} // Align button to center vertically
+                >
+                  Approved List
+                </Button>
+              </Space>
             </Card>
-          </Col>
-      
 
-          
+            <br />
+          </Col> */}
+
           {/* Listing Section */}
-          <Col xs={24} sm={16} md={18} lg={19}>
+          <Col xs={24} sm={16} md={22} lg={22}>
             <Card
               title={
                 <div
@@ -500,61 +470,15 @@ const toInitCap = (str) => {
                     display: "flex",
                     justifyContent: "space-between",
                     padding: "15px",
-
-                    // textalign: "center",
-                    //       padding: "40px",
-                    //       // background: "linear-gradient(135deg, rgba(255, 0, 255, 1), rgba(0, 255, 255, 1))",
-                    //       // background: "skyblue",
-                    //       color: "#fff",
-                    //       borderradius: "8px",
-                    //       boxshadow: "0 4px 15px rgba(0, 0, 0, 0.3)"
-                 
                   }}
                 >
-                  
-                  {/* <Text strong style={{ fontSize: '20px' }}>
-                    Invoice Requests
-                  </Text> */}
-
-<p>Invoice Requests</p>
-{/* 
-<div class="square">
-  <p class="square__text">
-    
-    <span class="square__text__gradient">
-    Invoice Requests
-    </span>
-  </p>
-</div> */}
-
-
-
-{/* <p class="line anim-typewriter" contenteditable="false" style={{
-        fontFamily: "'Arial', sans-serif", // Change font here
-        // color: "#4A90E2", // Change font color here
-        fontSize: "24px", // You can adjust font size as well
-         
-  /* Prevent selection (simulating read-only behavior) */
-  
-
-  /* Optional: Make it look more 'read-only' by changing cursor 
-  cursor: "not-allowed",
-      }} >{getGreeting()}!!!  Mr. {toInitCap(loginemail.split('@')[0])}</p>  */}
-
-
-
-
-<div>
-
-
-
-
-                  {/* <h3 style={{ display: 'inline'  , color: '#ff5733'}}>Hi  {getGreeting()}!!!  </h3>
-                  <h2 style={{ display: 'inline' , color: '#4CAF50'}}>Mr. {toInitCap(loginemail.split('@')[0])}</h2> */}
-
+                  <p>Invoice Requests</p>
+                  <div>
                     <Button
                       type="text"
-                      icon={theme === "light" ? <MoonOutlined /> : <SunOutlined />}
+                      icon={
+                        theme === "light" ? <MoonOutlined /> : <SunOutlined />
+                      }
                       onClick={toggleTheme}
                       size="small"
                       style={{ marginLeft: "10px" }}
@@ -562,15 +486,30 @@ const toInitCap = (str) => {
                       {theme === "light" ? "Dark Mode" : "Light Mode"}
                     </Button>
 
-                       <Button
-                      type="text"
-                      icon={<LogoutOutlined />}
-                      onClick={handleLogout}
-                      size="small"
-                      
+                    <Popover
+                      content={popoverContent}
+                      title="Filter"
+                      trigger="click"
+                      placement="bottomLeft"
+                      style={{ marginLeft: "10px" }}
                     >
-                      Logout
-                    </Button>
+                      <Button
+                        type="text"
+                        icon={<LogoutOutlined />}
+                        size="small"
+                      >
+                        Filter
+                      </Button>
+                      <Button
+                        type="text"
+                        icon={<RightCircleOutlined />}
+                        onClick={approvedList}
+                        size="small"
+                        style={{ alignSelf: "center" }}
+                      >
+                        Approved List
+                      </Button>
+                    </Popover>
                   </div>
                 </div>
               }
@@ -580,104 +519,148 @@ const toInitCap = (str) => {
                 borderRadius: "8px",
                 boxShadow: boxShadowStyle, // Apply custom box shadow
                 border: `1px solid ${cardBorderColor}`, // Apply conditional border color
-                
-              
               }}
-
-              
             >
-      
               {loading ? (
                 <Spin tip="Loading..." />
               ) : (
                 <Row gutter={[12, 12]}>
                   {filteredData.map((item) => (
                     <Col xs={24} sm={12} md={8} key={item.expenceId}>
-                      
-                        
-                        <div class="note-container">
-                        <div class="sticky-note sticky-note-one" contenteditable="false" style={{ color: 'black',colorTextBase : 'black' }}
-                        onClick={() => handleCardClick(item)} >
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Text strong  style={{ color : 'black'}}>{item.name}</Text>
-                        </div>
-                        <br />
-                        
-                        <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-                            <Text strong style={{ flex: 1 , color : 'black' }}>Doc ID:</Text>
-                            <Text strong style={{ color : 'black'}}>{item.expenceId}</Text>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <Text strong style={{ flex: 1 , color : 'black' }}>Doc Date:</Text>
-                            <Text strong style={{ color : 'black'}}>{new Date(item.docDate).toLocaleDateString('en-GB')} </Text>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <Text strong style={{ flex: 1 , color : 'black'}}>Amount:</Text>
-                            <Text strong style={{ color : 'black'}}>
-                              {new Intl.NumberFormat("en-IN", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              }).format(item.amount)}
-                            </Text>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <Text strong style={{ flex: 1, color : 'black' }}>Currency:</Text>
-                            <Text strong style={{ color : 'black'}}>{item.currency}</Text>
-                          </div>
-
-                        <br />
-                        {/* Approve/Reject Buttons on Card */}
-                        <Space style={{ marginTop: "10px" }}>
-                          <Button id="celebrateBtn"
-                            type="default"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleApprove(item);
-                              handleCelebrate();
-                            }}
-                            size="small"
+                      <div class="note-container">
+                        <div
+                          class="sticky-note sticky-note-one"
+                          contenteditable="false"
+                          style={{ color: "black", colorTextBase: "black" }}
+                          onClick={() => handleCardClick(item)}
+                        >
+                          <div
                             style={{
-                              borderColor: "green",
-                              color: "green",
-                              backgroundColor: "transparent",
-
-                              cursor: "pointer",
-                              transition: "transform 0.1s ease",
-                              
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: "5px",
                             }}
                           >
-                            Approve
-                          </Button>
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <Text strong style={{ color: "black" }}>
+                                {item.name}
+                              </Text>
+                            </div>
+                            <br />
 
-                          <Button
-                            type="default"
-                            danger
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleReject(item);
-                            }}
-                            size="small"
-                            style={{
-                              
-                              backgroundColor: "transparent",
-                            }}
-                          >
-                            Reject
-                          </Button>
-                          
-                        </Space>
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-evenly",
+                              }}
+                            >
+                              <Text strong style={{ flex: 1, color: "black" }}>
+                                Doc ID:
+                              </Text>
+                              <Text strong style={{ color: "black" }}>
+                                {item.expenceId}
+                              </Text>
+                            </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <Text strong style={{ flex: 1, color: "black" }}>
+                                Doc Date:
+                              </Text>
+                              <Text strong style={{ color: "black" }}>
+                                {new Date(item.docDate).toLocaleDateString(
+                                  "en-GB"
+                                )}{" "}
+                              </Text>
+                            </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <Text strong style={{ flex: 1, color: "black" }}>
+                                Amount:
+                              </Text>
+                              <Text strong style={{ color: "black" }}>
+                                {new Intl.NumberFormat("en-IN", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }).format(item.amount)}
+                              </Text>
+                            </div>
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <Text strong style={{ flex: 1, color: "black" }}>
+                                Currency:
+                              </Text>
+                              <Text strong style={{ color: "black" }}>
+                                {item.currency}
+                              </Text>
+                            </div>
+
+                            <br />
+                            {/* Approve/Reject Buttons on Card */}
+                            <Space style={{ marginTop: "10px" }}>
+                              <Button
+                                id="celebrateBtn"
+                                type="default"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleApprove(item);
+                                  handleCelebrate();
+                                }}
+                                size="small"
+                                style={{
+                                  borderColor: "green",
+                                  color: "green",
+                                  backgroundColor: "transparent",
+
+                                  cursor: "pointer",
+                                  transition: "transform 0.1s ease",
+                                }}
+                              >
+                                Approve
+                              </Button>
+
+                              <Button
+                                type="default"
+                                danger
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleReject(item);
+                                }}
+                                size="small"
+                                style={{
+                                  backgroundColor: "transparent",
+                                }}
+                              >
+                                Reject
+                              </Button>
+                            </Space>
+                          </div>
                         </div>
-                      </div>
                       </div>
                     </Col>
                   ))}
                 </Row>
-                
               )}
 
-              {filteredData.length === 0 && <NoDataFallback onRetry={fetchData} />}
+              {filteredData.length === 0 && (
+                <NoDataFallback onRetry={fetchData} />
+              )}
             </Card>
           </Col>
         </Row>
@@ -698,7 +681,9 @@ const toInitCap = (str) => {
                 labelStyle={{ fontWeight: "bold", padding: "4px 8px" }}
                 contentStyle={{ padding: "4px 8px" }}
               >
-                <Descriptions.Item label="Name">{selectedItem.name}</Descriptions.Item>
+                <Descriptions.Item label="Name">
+                  {selectedItem.name}
+                </Descriptions.Item>
                 <Descriptions.Item label="Doc ID">
                   {selectedItem.expenceId}
                 </Descriptions.Item>
@@ -730,7 +715,6 @@ const toInitCap = (str) => {
                   marginTop: "10px",
                   justifyContent: "center",
                   width: "100%",
-                  
                 }}
               >
                 <Button
@@ -740,9 +724,8 @@ const toInitCap = (str) => {
                     borderColor: "green",
                     color: "green",
                     backgroundColor: "white",
-                    
                   }}
-                  onClick={() => handleApprove(selectedItem) }
+                  onClick={() => handleApprove(selectedItem)}
                 >
                   Approve
                 </Button>
@@ -751,9 +734,7 @@ const toInitCap = (str) => {
                   danger
                   size="small"
                   style={{
-                    
                     backgroundColor: "white",
-                    
                   }}
                   onClick={() => handleReject(selectedItem)}
                 >
