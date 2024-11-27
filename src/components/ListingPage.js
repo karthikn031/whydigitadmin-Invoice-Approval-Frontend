@@ -234,20 +234,39 @@ const ListingPage = () => {
   };
 
   // Filter the data by date range, name, amount, and currency
-  // const filteredData = data.filter(
-  //   (item) =>
-  //     (filter.name === "" ||
-  //       item.name.toLowerCase().includes(filter.name.toLowerCase())) &&
-  //     (filter.amount === null || item.amount.includes(filter.amount)) &&
-  //     (filter.currency === "" ||
-  //       item.currency.toLowerCase().includes(filter.currency.toLowerCase())) &&
-  //     // Date filter logic
-  //     (!filter.startDate ||
-  //       new Date(item.docDate) >= new Date(filter.startDate)) &&
-  //     (!filter.endDate || new Date(item.docDate) <= new Date(filter.endDate))
-  // );
+  const filteredData = data.filter((item) => {
+    const nameMatch =
+      filter.name === "" ||
+      (item.name &&
+        item.name.toLowerCase().includes(filter.name?.toLowerCase() || ""));
 
-  const filteredData = [];
+    const amountMatch =
+      filter.amount === null ||
+      (item.amount && item.amount.includes(filter.amount));
+
+    const currencyMatch =
+      filter.currency === "" ||
+      (item.currency &&
+        item.currency
+          .toLowerCase()
+          .includes(filter.currency?.toLowerCase() || ""));
+
+    const startDateMatch =
+      !filter.startDate || new Date(item.docDate) >= new Date(filter.startDate);
+
+    const endDateMatch =
+      !filter.endDate || new Date(item.docDate) <= new Date(filter.endDate);
+
+    return (
+      nameMatch &&
+      amountMatch &&
+      currencyMatch &&
+      startDateMatch &&
+      endDateMatch
+    );
+  });
+
+  // const filteredData = data;
 
   const themeConfig =
     theme === "dark"
