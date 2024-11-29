@@ -1,7 +1,10 @@
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import DashboardIcon from "@mui/icons-material/Dashboard";
+import ListAltIcon from "@mui/icons-material/ListAlt";
 import MenuIcon from "@mui/icons-material/Menu";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import ScreenShareIcon from "@mui/icons-material/ScreenShare";
+import VerifiedIcon from "@mui/icons-material/Verified";
 import {
   Box,
   Drawer,
@@ -32,10 +35,12 @@ const Sidebar = () => {
   const menuItems = [
     { text: "Overview", icon: <DashboardIcon />, path: "/overview" },
     { text: "Reports", icon: <BarChartIcon />, path: "/reports" },
-    { text: "Listing", icon: <AccountCircleIcon />, path: "/listing" },
+    { text: "User Creation", icon: <PersonAddIcon />, path: "/userCreation" },
+    { text: "Screen", icon: <ScreenShareIcon />, path: "/screen" },
+    { text: "Listing", icon: <ListAltIcon />, path: "/listing" },
     {
       text: "Approved List",
-      icon: <AccountCircleIcon />,
+      icon: <VerifiedIcon />,
       path: "/ApprovedList",
     },
   ];

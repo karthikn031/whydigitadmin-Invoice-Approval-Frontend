@@ -7,6 +7,8 @@ import ListingPage from "./components/ListingPage";
 import LoginPage from "./components/LoginPage";
 import Overview from "./components/Overview";
 import { Reports } from "./components/Reports";
+import { Screen } from "./components/Screen";
+import { UserCreation } from "./components/UserCreation";
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
           <Route path="/listing" element={<ListingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/reports" element={<Reports />} />
+          <Route path="/screen" element={<Screen />} />
+          <Route path="/userCreation" element={<UserCreation />} />
         </Route>
       </Routes>
     </Router>

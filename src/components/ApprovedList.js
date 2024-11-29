@@ -12,10 +12,11 @@ import {
   DatePicker,
   Input,
   notification,
+  Popover,
   Row,
   Space,
   Spin,
-  Typography,  Popover,
+  Typography,
 } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -145,7 +146,6 @@ const ApprovedList = () => {
   const Listing = () => {
     navigate("/Listing"); // Navigate to the approved list page
   };
-
 
   // Function to show time
   const showTime = () => {
@@ -304,7 +304,7 @@ const ApprovedList = () => {
           </Col> */}
 
           {/* Listing Section */}
-          <Col xs={24} sm={16} md={18} lg={19}>
+          <Col xs={24} sm={16} md={24} lg={21}>
             <Card
               title={
                 <div
@@ -330,7 +330,7 @@ const ApprovedList = () => {
                     >
                       {theme === "light" ? "Dark Mode" : "Light Mode"}
                     </Button>
-                  
+
                     <Popover
                       content={popoverContent}
                       title="Filter"
@@ -355,8 +355,6 @@ const ApprovedList = () => {
                         Listing
                       </Button>
                     </Popover>
-
-                  
                   </div>
                 </div>
               }
