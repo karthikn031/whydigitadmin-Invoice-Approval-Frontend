@@ -9,24 +9,27 @@ import {
   Button,
   Checkbox,
   Grid,
+  IconButton,
+  MenuItem,
+  Paper,
   Select,
   Tab,
   Table,
+  TableBody,
+  TableCell,
+  TableContainer,
   TableHead,
   TableRow,
-  TableCell,
-  TableBody,
-  MenuItem,
-  IconButton,
-  TableContainer,
-  Paper,
-  Tooltip,
   Tabs,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import axios from "axios"; // Import axios
+import axios from "axios";
 import React, { useState } from "react";
+import { encryptPassword } from "../utils/encPassword";
+
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8091";
 
 export const UserCreation = () => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -34,14 +37,32 @@ export const UserCreation = () => {
     employeeName: "",
     employeeCode: "",
     nickName: "",
-    userType: "",
     email: "",
+    password: "",
+    userType: "",
     active: true,
   });
+
   const [roles, setRoles] = useState([
     { role: "", startDate: "", endDate: "" },
   ]);
 
+  const handleClear = () => {
+    setFormData({
+      employeeName: "",
+      employeeCode: "",
+      nickName: "",
+      email: "",
+      password: "",
+      userType: "",
+      active: true,
+    });
+    // setRoles({
+    //   role: "",
+    //   startDate: "",
+    //   endDate: "",
+    // });
+  };
   // Handle input changes for form fields
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -69,28 +90,45 @@ export const UserCreation = () => {
   // Save user data
   const handleSave = async () => {
     // Basic validation
-    if (!formData.employeeName || !formData.userType || !formData.mobile) {
+    if (
+      !formData.employeeName ||
+      !formData.employeeCode ||
+      !formData.userType ||
+      !formData.email ||
+      !formData.password
+    ) {
       alert("Please fill in all required fields.");
       return;
     }
 
-    // Prepare payload
+    // Prepare the payload
     const payload = {
-      ...formData,
-      roles,
+      active: formData.active,
+      email: formData.email,
+      employeeCode: formData.employeeCode,
+      employeeName: formData.employeeName,
+      nickName: formData.nickName,
+      password: encryptPassword(formData.password),
+      userType: formData.userType,
+      roleAccessDTO: roles.map((role) => ({
+        role: role.role,
+        startDate: role.startDate,
+        endDate: role.endDate,
+        roleId: 0, // Default value for roleId
+      })),
+      userName: formData.employeeCode, // Using employeeCode as username
     };
 
     try {
-      // Example API call using axios
-      const response = await axios.post("/api/users", payload);
+      const response = await axios.put(`${API_URL}/api/auth/signup`, payload);
 
       if (response.status === 200) {
-        alert("User saved successfully!");
+        alert("User created successfully!");
       } else {
-        alert("Failed to save user.");
+        alert("Failed to create user.");
       }
     } catch (error) {
-      console.error("Error saving user:", error);
+      console.error("Error creating user:", error);
       alert("Error occurred while saving.");
     }
   };
@@ -103,61 +141,62 @@ export const UserCreation = () => {
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
         <Typography variant="h5">User Creation</Typography>
         <Box
-      sx={{
-        display: "flex",
-        justifyContent: "flex-end",
-        gap: 1,
-        padding: 1,
-        backgroundColor: "#f5f5f5",
-        borderRadius: 2,
-        boxShadow: 1,
-      }}
-    >
-      <Tooltip title="Search">
-        <IconButton
           sx={{
-            color: "#007bff",
-            "&:hover": { backgroundColor: "#e3f2fd" },
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: 1,
+            padding: 1,
+            backgroundColor: "#f5f5f5",
+            borderRadius: 2,
+            boxShadow: 1,
           }}
         >
-          <SearchIcon />
-        </IconButton>
-      </Tooltip>
+          <Tooltip title="Search">
+            <IconButton
+              sx={{
+                color: "#007bff",
+                "&:hover": { backgroundColor: "#e3f2fd" },
+              }}
+            >
+              <SearchIcon />
+            </IconButton>
+          </Tooltip>
 
-      <Tooltip title="Close">
-        <IconButton
-          sx={{
-            color: "#dc3545",
-            "&:hover": { backgroundColor: "#fdecea" },
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </Tooltip>
+          <Tooltip title="Close">
+            <IconButton
+              onClick={handleClear}
+              sx={{
+                color: "#dc3545",
+                "&:hover": { backgroundColor: "#fdecea" },
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Tooltip>
 
-      <Tooltip title="View List">
-        <IconButton
-          sx={{
-            color: "#28a745",
-            "&:hover": { backgroundColor: "#e9f7ef" },
-          }}
-        >
-          <ListAltIcon />
-        </IconButton>
-      </Tooltip>
+          <Tooltip title="View List">
+            <IconButton
+              sx={{
+                color: "#28a745",
+                "&:hover": { backgroundColor: "#e9f7ef" },
+              }}
+            >
+              <ListAltIcon />
+            </IconButton>
+          </Tooltip>
 
-      <Tooltip title="Save">
-        <IconButton
-          onClick={handleSave}
-          sx={{
-            color: "#ffc107",
-            "&:hover": { backgroundColor: "#fff8e1" },
-          }}
-        >
-          <SaveIcon />
-        </IconButton>
-      </Tooltip>
-    </Box>
+          <Tooltip title="Save">
+            <IconButton
+              onClick={handleSave}
+              sx={{
+                color: "#ffc107",
+                "&:hover": { backgroundColor: "#fff8e1" },
+              }}
+            >
+              <SaveIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Box>
 
       {/* Form */}
@@ -168,11 +207,13 @@ export const UserCreation = () => {
             { label: "Employee Code", name: "employeeCode" },
             { label: "Nick Name", name: "nickName" },
             { label: "Email", name: "email" },
+            { label: "Password", name: "password" },
           ].map((field) => (
             <Grid item xs={3} key={field.name}>
               <TextField
                 label={field.label}
                 name={field.name}
+                type={field.name === "password" ? "password" : "text"}
                 value={formData[field.name]}
                 onChange={handleInputChange}
                 size="small"
@@ -210,12 +251,11 @@ export const UserCreation = () => {
         </Grid>
       </Box>
 
-      {/* Tabs */}
+      {/* Roles Tab */}
       <Box sx={{ backgroundColor: "#fff", p: 2, borderRadius: 2 }}>
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
           <Tabs value={tabIndex} onChange={(_, index) => setTabIndex(index)}>
             <Tab label="Roles" />
-            {/* <Tab label="Branch Accessible" /> */}
           </Tabs>
           {tabIndex === 0 && (
             <Button
@@ -228,115 +268,67 @@ export const UserCreation = () => {
           )}
         </Box>
 
-        {/* Roles */}
         {tabIndex === 0 && (
-         <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3 }}>
-         <Table>
-           {/* Table Header */}
-           <TableHead>
-             <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-               <TableCell sx={{ fontWeight: "bold", color: "#333" }}>Action</TableCell>
-               <TableCell sx={{ fontWeight: "bold", color: "#333" }}>Role</TableCell>
-               <TableCell sx={{ fontWeight: "bold", color: "#333" }}>Start Date</TableCell>
-               <TableCell sx={{ fontWeight: "bold", color: "#333" }}>End Date</TableCell>
-             </TableRow>
-           </TableHead>
-   
-           {/* Table Body */}
-           <TableBody>
-             {roles.map((role, index) => (
-               <TableRow
-                 key={index}
-                 sx={{
-                   "&:nth-of-type(odd)": { backgroundColor: "#fafafa" },
-                   "&:hover": { backgroundColor: "#f0f8ff" },
-                 }}
-               >
-                 {/* Action Cell */}
-                 <TableCell>
-                   <Tooltip title="Delete Role">
-                     <IconButton
-                       onClick={() => handleDeleteRole(index)}
-                       sx={{ color: "#ff4d4d" }}
-                     >
-                       <DeleteIcon />
-                     </IconButton>
-                   </Tooltip>
-                 </TableCell>
-   
-                 {/* Role Cell */}
-                 <TableCell>
-                   <Select
-                     value={role.role}
-                     onChange={(e) => handleRoleChange(index, "role", e.target.value)}
-                     size="small"
-                     fullWidth
-                     displayEmpty
-                     sx={{
-                       backgroundColor: "#fff",
-                       borderRadius: 1,
-                       "& .MuiOutlinedInput-notchedOutline": {
-                         borderColor: "#ddd",
-                       },
-                       "&:hover .MuiOutlinedInput-notchedOutline": {
-                         borderColor: "#999",
-                       },
-                     }}
-                   >
-                     <MenuItem value="" disabled>
-                       Select Role
-                     </MenuItem>
-                     <MenuItem value="Manager">Manager</MenuItem>
-                     <MenuItem value="Developer">Developer</MenuItem>
-                   </Select>
-                 </TableCell>
-   
-                 {/* Start Date Cell */}
-                 <TableCell>
-                   <TextField
-                     type="date"
-                     size="small"
-                     fullWidth
-                     value={role.startDate}
-                     onChange={(e) => handleRoleChange(index, "startDate", e.target.value)}
-                     sx={{
-                       backgroundColor: "#fff",
-                       borderRadius: 1,
-                       "& .MuiOutlinedInput-notchedOutline": {
-                         borderColor: "#ddd",
-                       },
-                       "&:hover .MuiOutlinedInput-notchedOutline": {
-                         borderColor: "#999",
-                       },
-                     }}
-                   />
-                 </TableCell>
-   
-                 {/* End Date Cell */}
-                 <TableCell>
-                   <TextField
-                     type="date"
-                     size="small"
-                     fullWidth
-                     value={role.endDate}
-                     onChange={(e) => handleRoleChange(index, "endDate", e.target.value)}
-                     sx={{
-                       backgroundColor: "#fff",
-                       borderRadius: 1,
-                       "& .MuiOutlinedInput-notchedOutline": {
-                         borderColor: "#ddd",
-                       },
-                       "&:hover .MuiOutlinedInput-notchedOutline": {
-                         borderColor: "#999",
-                       },
-                     }}
-                   />
-                 </TableCell>
-               </TableRow>
-             ))}
-           </TableBody>
-         </Table>
-       </TableContainer>
+          <TableContainer
+            component={Paper}
+            sx={{ borderRadius: 2, boxShadow: 3 }}
+          >
+            <Table>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+                  <TableCell>Action</TableCell>
+                  <TableCell>Role</TableCell>
+                  <TableCell>Start Date</TableCell>
+                  <TableCell>End Date</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {roles.map((role, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <Tooltip title="Delete Role">
+                        <IconButton onClick={() => handleDeleteRole(index)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell>
+                      <TextField
+                        size="small"
+                        value={role.role}
+                        onChange={(e) =>
+                          handleRoleChange(index, "role", e.target.value)
+                        }
+                        fullWidth
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <TextField
+                        type="date"
+                        size="small"
+                        value={role.startDate}
+                        onChange={(e) =>
+                          handleRoleChange(index, "startDate", e.target.value)
+                        }
+                        fullWidth
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <TextField
+                        type="date"
+                        size="small"
+                        value={role.endDate}
+                        onChange={(e) =>
+                          handleRoleChange(index, "endDate", e.target.value)
+                        }
+                        fullWidth
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         )}
       </Box>
     </Box>

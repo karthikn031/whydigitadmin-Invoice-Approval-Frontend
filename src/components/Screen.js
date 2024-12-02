@@ -5,9 +5,12 @@ import CloseIcon from "@mui/icons-material/Close";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import SaveIcon from "@mui/icons-material/Save";
 import SearchIcon from "@mui/icons-material/Search";
+import axios from "axios";
 import ResponsibilitiesTab from "./Roles/ResponsibilitiesTab";
 import RolesTab from "./Roles/RolesTab";
 import ScreenTab from "./Roles/ScreenTab";
+
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8091";
 
 export const Screen = () => {
   const [tabIndex, setTabIndex] = useState(0);
@@ -16,34 +19,219 @@ export const Screen = () => {
   const [screenData, setScreenData] = useState({
     screenCode: "",
     screenName: "",
+    active: "",
   });
 
   // State for tab 2 (Responsibilities)
   const [responsibilitiesData, setResponsibilitiesData] = useState({
-    name: "",
-    screen: "",
+    responsibility: "",
+    screenName: [],
+    active: false,
   });
 
   // State for tab 3 (Roles)
   const [rolesData, setRolesData] = useState({
     role: "",
-    responsibilities: "",
+    responsibility: "",
+    active: false,
   });
 
   // Handle input changes for fields in each tab
   const handleScreenChange = (e) => {
     const { name, value } = e.target;
     setScreenData({ ...screenData, [name]: value });
+    console.log("Screen", screenData);
   };
 
-  const handleResponsibilitiesChange = (e) => {
-    const { name, value } = e.target;
-    setResponsibilitiesData({ ...responsibilitiesData, [name]: value });
+  const handleResponsibilitiesChange = (event) => {
+    const { name, value } = event.target;
+
+    if (name === "screenName") {
+      // Handle multi-select for screen
+      setResponsibilitiesData((prevState) => ({
+        ...prevState,
+        [name]: typeof value === "string" ? value.split(",") : value,
+      }));
+    } else {
+      setResponsibilitiesData((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
   };
 
   const handleRolesChange = (e) => {
     const { name, value } = e.target;
     setRolesData({ ...rolesData, [name]: value });
+  };
+
+  const handleClearScreen = () => {
+    setScreenData({
+      screenCode: "",
+      screenName: "",
+      active: "",
+    });
+  };
+
+  const handleScreenSave = async () => {
+    // Validate input fields
+    if (!screenData.screenCode || screenData.screenCode.trim() === "") {
+      alert("Screen Code is required.");
+      return;
+    }
+    if (!screenData.screenName || screenData.screenName.trim() === "") {
+      alert("Screen Name is required.");
+      return;
+    }
+
+    const payload = {
+      active: screenData.active,
+      createdBy: localStorage.getItem("userName"),
+      screenCode: screenData.screenCode,
+      screenName: screenData.screenName,
+    };
+
+    try {
+      const response = await axios.put(
+        `${API_URL}/api/auth/createUpdateScreenNames`,
+        payload
+      );
+
+      if (response.data.status === true) {
+        const audio = new Audio("/success.wav"); // Replace with your sound file path
+        audio.play();
+
+        // Success logic here
+        // notification.success({
+        //   message: `Item ${item.id} Rejected`,
+        //   description: `You have rejected item ${item.id}.`,
+        // });
+        // fetchData();
+        // setIsModalOpen(false);
+      } else {
+        // Handle failure response
+        // notification.error({
+        //   message: `Item ${item.id} failed`,
+        // });
+      }
+    } catch (error) {
+      console.log("Error Response:", error.response?.data);
+      const errorMessage =
+        error.response?.data?.paramObjectsMap?.errorMessage ||
+        error.response?.data?.message ||
+        "An unexpected error occurred. Please try again.";
+      alert(errorMessage); // Show error message
+    }
+  };
+
+  const handleResponsibilitiesSave = async () => {
+    // Validate input fields
+    if (
+      !responsibilitiesData.responsibility ||
+      responsibilitiesData.responsibility === ""
+    ) {
+      alert("Responsibility is required.");
+      return;
+    }
+    if (
+      !responsibilitiesData.screenName ||
+      responsibilitiesData.screenName === ""
+    ) {
+      alert("Screen Name is required.");
+      return;
+    }
+
+    const payload = {
+      active: responsibilitiesData.active,
+      createdBy: localStorage.getItem("userName"),
+      responsibility: responsibilitiesData.responsibility, // Assuming 'responsibility' maps to 'name'
+      screensDTO: responsibilitiesData.screenName.map((screenName) => ({
+        screenName,
+      })),
+    };
+
+    try {
+      const response = await axios.put(
+        `${API_URL}/api/auth/createUpdateResponsibility`,
+        payload
+      );
+
+      if (response.data.status === true) {
+        const audio = new Audio("/success.wav"); // Replace with your sound file path
+        audio.play();
+
+        // Success logic here
+        // notification.success({
+        //   message: `Item ${item.id} Rejected`,
+        //   description: `You have rejected item ${item.id}.`,
+        // });
+        // fetchData();
+        // setIsModalOpen(false);
+      } else {
+        // Handle failure response
+        // notification.error({
+        //   message: `Item ${item.id} failed`,
+        // });
+      }
+    } catch (error) {
+      console.log("Error Response:", error.response?.data);
+      const errorMessage =
+        error.response?.data?.paramObjectsMap?.errorMessage ||
+        error.response?.data?.message ||
+        "An unexpected error occurred. Please try again.";
+      alert(errorMessage); // Show error message
+    }
+  };
+
+  const handleRolesSave = async () => {
+    // Validate input fields
+    if (!rolesData.responsibility || rolesData.responsibility === "") {
+      alert("Responsibility is required.");
+      return;
+    }
+    if (!rolesData.role || rolesData.role === "") {
+      alert("Screen Name is required.");
+      return;
+    }
+
+    const payload = {
+      active: rolesData.active,
+      createdBy: localStorage.getItem("userName"),
+      responsibilities: rolesData.responsibility,
+      role: rolesData.screenName,
+    };
+
+    try {
+      const response = await axios.put(
+        `${API_URL}/api/auth/createUpdateRoles`,
+        payload
+      );
+
+      if (response.data.status === true) {
+        const audio = new Audio("/success.wav"); // Replace with your sound file path
+        audio.play();
+
+        // Success logic here
+        // notification.success({
+        //   message: `Item ${item.id} Rejected`,
+        //   description: `You have rejected item ${item.id}.`,
+        // });
+        // fetchData();
+        // setIsModalOpen(false);
+      } else {
+        // Handle failure response
+        // notification.error({
+        //   message: `Item ${item.id} failed`,
+        // });
+      }
+    } catch (error) {
+      console.log("Error Response:", error.response?.data);
+      const errorMessage =
+        error.response?.data?.paramObjectsMap?.errorMessage ||
+        error.response?.data?.message ||
+        "An unexpected error occurred. Please try again.";
+      alert(errorMessage); // Show error message
+    }
   };
 
   return (
@@ -81,13 +269,13 @@ export const Screen = () => {
                       <SearchIcon />
                     </IconButton>
                     <IconButton>
-                      <CloseIcon />
+                      <CloseIcon onClick={handleClearScreen} />
                     </IconButton>
                     <IconButton>
                       <ListAltIcon />
                     </IconButton>
                     <IconButton>
-                      <SaveIcon />
+                      <SaveIcon onClick={handleScreenSave} />
                     </IconButton>
                   </Box>
                 </Box>
@@ -97,6 +285,8 @@ export const Screen = () => {
               screenData={screenData}
               handleScreenChange={handleScreenChange}
             />
+
+            {/* <CommonTable /> */}
           </Box>
         )}
 
@@ -123,7 +313,7 @@ export const Screen = () => {
                       <ListAltIcon />
                     </IconButton>
                     <IconButton>
-                      <SaveIcon />
+                      <SaveIcon onClick={handleResponsibilitiesSave} />
                     </IconButton>
                   </Box>
                 </Box>
@@ -159,7 +349,7 @@ export const Screen = () => {
                       <ListAltIcon />
                     </IconButton>
                     <IconButton>
-                      <SaveIcon />
+                      <SaveIcon onClick={handleRolesSave} />
                     </IconButton>
                   </Box>
                 </Box>
