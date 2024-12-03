@@ -71,3 +71,29 @@ export const getInvDetailsApprove1 = async () => {
     throw error;
   }
 };
+
+
+
+
+export const getAllUsers = async () => {
+  try {
+    // Corrected the endpoint URL and closing braces issue
+    const response = await axios.get(`${API_URL}/api/auth/allUsers`);
+
+    // Ensure that the response contains the expected structure
+    if (response.data && response.data.paramObjectsMap?.userVO) {
+      return response.data.paramObjectsMap.userVO.map((item) => ({
+        id: item.id,
+        userName: item.userName,
+        nickName: item.nickName,
+        email: item.email,
+      }));
+    } else {
+      throw new Error("Data not found or API error");
+    }
+  } catch (error) {
+    console.error("Error fetching listing data:", error);
+    throw error; // Re-throw error to propagate it to the caller
+  }
+};
+
