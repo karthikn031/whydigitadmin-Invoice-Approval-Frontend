@@ -1,11 +1,20 @@
-import { Box, Grid, IconButton, Tab, Tabs, Typography } from "@mui/material";
-import React, { useState } from "react";
+import {
+  Box,
+  Grid,
+  IconButton,
+  Tab,
+  Tabs,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import React, { useEffect, useState } from "react";
 
 import CloseIcon from "@mui/icons-material/Close";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import SaveIcon from "@mui/icons-material/Save";
 import SearchIcon from "@mui/icons-material/Search";
 import axios from "axios";
+import TableComp from "../utils/TableComp";
 import ResponsibilitiesTab from "./Roles/ResponsibilitiesTab";
 import RolesTab from "./Roles/RolesTab";
 import ScreenTab from "./Roles/ScreenTab";
@@ -14,13 +23,32 @@ const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8091";
 
 export const Screen = () => {
   const [tabIndex, setTabIndex] = useState(0);
-
+  const [screenDataList, setScreenDataList] = useState([]);
+  const [resDataList, setResDataList] = useState([]);
+  const [roleDataList, setRoleDataList] = useState([]);
   // State for tab 1 (Screen)
   const [screenData, setScreenData] = useState({
     screenCode: "",
     screenName: "",
     active: "",
   });
+
+  const [screenListView, setScreenListView] = useState(false);
+  const [resListView, setResListView] = useState(false);
+  const [roleListView, setRoleListView] = useState(false);
+  const [editId, setEditId] = useState(false);
+
+  const handleScreenList = () => {
+    setScreenListView(!screenListView);
+  };
+
+  const handleResList = () => {
+    setResListView(!resListView);
+  };
+
+  const handleRoleList = () => {
+    setRoleListView(!roleListView);
+  };
 
   // State for tab 2 (Responsibilities)
   const [responsibilitiesData, setResponsibilitiesData] = useState({
@@ -35,6 +63,12 @@ export const Screen = () => {
     responsibility: "",
     active: false,
   });
+
+  useEffect(() => {
+    getScreenNames();
+    getResponsibility();
+    getRole();
+  }, []);
 
   // Handle input changes for fields in each tab
   const handleScreenChange = (e) => {
@@ -73,6 +107,71 @@ export const Screen = () => {
     });
   };
 
+  const handleClearRes = () => {
+    setResponsibilitiesData({
+      responsibility: "",
+      screenName: "",
+      active: false,
+    });
+  };
+
+  const handleClearRole = () => {
+    setResponsibilitiesData({
+      role: "",
+      responsibility: "",
+      active: false,
+    });
+  };
+
+  const screenHeaders = ["id", "screenName", "screenCode", "active"]; // Example header
+
+  const getScreenNames = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/auth/getAllScreenNames`);
+
+      if (response.status === 200) {
+        // Extract only the screenName values and set them in screenData
+
+        setScreenDataList(response.data.paramObjectsMap.screenNamesVO); // Setting only screenName values in the state
+      } else {
+        console.error("Failed to fetch screen names");
+      }
+    } catch (error) {
+      console.error("Error fetching screen names:", error);
+      alert("Error occurred while fetching screen names.");
+    }
+  };
+
+  const getScreenById = async (row) => {
+    setEditId(true);
+    setScreenDataList(true);
+
+    console.log("Test", row);
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/auth/screenNamesById?id=${row.id}`
+      );
+
+      if (response.status === 200) {
+        // Extract only the screenName values and set them in screenData
+
+        const screen = response.data.paramObjectsMap.screenNamesVO;
+
+        setScreenData({
+          screenCode: screen.screenCode,
+          screenName: screen.screenName,
+          active: screen.active,
+          id: screen.id,
+        });
+      } else {
+        console.error("Failed to fetch screen names");
+      }
+    } catch (error) {
+      console.error("Error fetching screen names:", error);
+      alert("Error occurred while fetching screen names.");
+    }
+  };
+
   const handleScreenSave = async () => {
     // Validate input fields
     if (!screenData.screenCode || screenData.screenCode.trim() === "") {
@@ -89,6 +188,7 @@ export const Screen = () => {
       createdBy: localStorage.getItem("userName"),
       screenCode: screenData.screenCode,
       screenName: screenData.screenName,
+      id: editId ? screenData.id : undefined, // Include 'id' only if 'editId' is true
     };
 
     try {
@@ -99,7 +199,7 @@ export const Screen = () => {
 
       if (response.data.status === true) {
         const audio = new Audio("/success.wav"); // Replace with your sound file path
-        audio.play();
+        handleClearScreen();
 
         // Success logic here
         // notification.success({
@@ -121,6 +221,40 @@ export const Screen = () => {
         error.response?.data?.message ||
         "An unexpected error occurred. Please try again.";
       alert(errorMessage); // Show error message
+    }
+  };
+
+  const getResponsibility = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/auth/allResponsibility`);
+
+      if (response.status === 200) {
+        // Extract only the screenName values and set them in screenData
+
+        setResListView(response.data.paramObjectsMap.responsibilityVO); // Setting only screenName values in the state
+      } else {
+        console.error("Failed to fetch screen names");
+      }
+    } catch (error) {
+      console.error("Error fetching screen names:", error);
+      alert("Error occurred while fetching screen names.");
+    }
+  };
+
+  const getRole = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/auth/allRoles`);
+
+      if (response.status === 200) {
+        // Extract only the screenName values and set them in screenData
+
+        setRolesData(response.data.paramObjectsMap.rolesVO); // Setting only screenName values in the state
+      } else {
+        console.error("Failed to fetch screen names");
+      }
+    } catch (error) {
+      console.error("Error fetching screen names:", error);
+      alert("Error occurred while fetching screen names.");
     }
   };
 
@@ -264,27 +398,44 @@ export const Screen = () => {
                   }}
                 >
                   {/* <Typography variant="h6">Screen</Typography> */}
-                  <Box>
-                    <IconButton>
-                      <SearchIcon />
-                    </IconButton>
-                    <IconButton>
-                      <CloseIcon onClick={handleClearScreen} />
-                    </IconButton>
-                    <IconButton>
-                      <ListAltIcon />
-                    </IconButton>
-                    <IconButton>
-                      <SaveIcon onClick={handleScreenSave} />
-                    </IconButton>
+
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <Tooltip title="Search">
+                      <IconButton>
+                        <SearchIcon sx={{ color: "#007bff" }} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Close">
+                      <IconButton onClick={handleClearScreen}>
+                        <CloseIcon sx={{ color: "#dc3545" }} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="View List">
+                      <IconButton onClick={handleScreenList}>
+                        <ListAltIcon sx={{ color: "#28a745" }} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Save">
+                      <IconButton onClick={handleScreenSave}>
+                        <SaveIcon sx={{ color: "#ffc107" }} />
+                      </IconButton>
+                    </Tooltip>
                   </Box>
                 </Box>
               </Grid>
             </Grid>
-            <ScreenTab
-              screenData={screenData}
-              handleScreenChange={handleScreenChange}
-            />
+            {screenListView ? (
+              <TableComp
+                headers={screenHeaders}
+                data={screenDataList}
+                onEdit={getScreenById}
+              />
+            ) : (
+              <ScreenTab
+                screenData={screenData}
+                handleScreenChange={handleScreenChange}
+              />
+            )}
 
             {/* <CommonTable /> */}
           </Box>
@@ -302,27 +453,39 @@ export const Screen = () => {
                     mb: 2,
                   }}
                 >
-                  <Box>
-                    <IconButton>
-                      <SearchIcon />
-                    </IconButton>
-                    <IconButton>
-                      <CloseIcon />
-                    </IconButton>
-                    <IconButton>
-                      <ListAltIcon />
-                    </IconButton>
-                    <IconButton>
-                      <SaveIcon onClick={handleResponsibilitiesSave} />
-                    </IconButton>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <Tooltip title="Search">
+                      <IconButton>
+                        <SearchIcon sx={{ color: "#007bff" }} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Close">
+                      <IconButton onClick={handleClearRes}>
+                        <CloseIcon sx={{ color: "#dc3545" }} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="View List">
+                      <IconButton onClick={handleResList}>
+                        <ListAltIcon sx={{ color: "#28a745" }} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Save">
+                      <IconButton onClick={handleResponsibilitiesSave}>
+                        <SaveIcon sx={{ color: "#ffc107" }} />
+                      </IconButton>
+                    </Tooltip>
                   </Box>
                 </Box>
               </Grid>
             </Grid>
-            <ResponsibilitiesTab
-              responsibilitiesData={responsibilitiesData}
-              handleResponsibilitiesChange={handleResponsibilitiesChange}
-            />
+            {resListView ? (
+              <TableComp headers={screenHeaders} data={resDataList} />
+            ) : (
+              <ResponsibilitiesTab
+                responsibilitiesData={responsibilitiesData}
+                handleResponsibilitiesChange={handleResponsibilitiesChange}
+              />
+            )}
           </Box>
         )}
 
@@ -338,7 +501,7 @@ export const Screen = () => {
                     mb: 2,
                   }}
                 >
-                  <Box>
+                  {/* <Box>
                     <IconButton>
                       <SearchIcon />
                     </IconButton>
@@ -351,14 +514,40 @@ export const Screen = () => {
                     <IconButton>
                       <SaveIcon onClick={handleRolesSave} />
                     </IconButton>
+                  </Box> */}
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <Tooltip title="Search">
+                      <IconButton>
+                        <SearchIcon sx={{ color: "#007bff" }} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Close">
+                      <IconButton onClick={handleClearRole}>
+                        <CloseIcon sx={{ color: "#dc3545" }} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="View List">
+                      <IconButton onClick={handleRoleList}>
+                        <ListAltIcon sx={{ color: "#28a745" }} />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Save">
+                      <IconButton onClick={handleRolesSave}>
+                        <SaveIcon sx={{ color: "#ffc107" }} />
+                      </IconButton>
+                    </Tooltip>
                   </Box>
                 </Box>
               </Grid>
             </Grid>
-            <RolesTab
-              rolesData={rolesData}
-              handleRolesChange={handleRolesChange}
-            />
+            {roleListView ? (
+              <TableComp headers={screenHeaders} data={roleDataList} />
+            ) : (
+              <RolesTab
+                rolesData={rolesData}
+                handleRolesChange={handleRolesChange}
+              />
+            )}
           </Box>
         )}
       </Box>

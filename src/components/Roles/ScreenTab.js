@@ -1,4 +1,4 @@
-import { Grid, TextField, Checkbox, FormControlLabel } from "@mui/material";
+import { Checkbox, FormControlLabel, Grid, TextField } from "@mui/material";
 import React from "react";
 
 const ScreenTab = ({ screenData, handleScreenChange }) => {
