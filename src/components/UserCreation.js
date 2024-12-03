@@ -46,7 +46,10 @@
     Spin
   } from "antd";
 
+  import { getAllRoles } from "../services/api";
+
   const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8091";
+  
 
   export const UserCreation = () => {
     const [tabIndex, setTabIndex] = useState(0);
@@ -61,6 +64,8 @@
     });
     const [roles, setRoles] = useState([{ role: "", startDate: "", endDate: "" }]);
 
+    const [roledata, setRoleData] = useState([{role: "", startDate: "", endDate: ""}]); 
+
     const [isListView, setIsListView] = useState(false);
     const [userId, setUserId] = useState(null); // Tracks the selected user ID for editing
     const [users, setUsers] = useState([]); // User list for the embedded list view
@@ -74,6 +79,7 @@
 
     useEffect(() => {
       fetchData();
+      fetchRolesData();
     }, []);
 
     useEffect(() => {
@@ -82,6 +88,25 @@
       }
     }, [userId]);
 
+
+    const fetchRolesData = () => {
+      setLoading(true);
+      console.log("role","test")
+      getAllRoles()
+        .then((response) => {
+          setRoleData(response);
+          setLoading(false);
+          console.log("role", response)
+        })
+        .catch(() => {
+          notification.error({
+            message: "Data Fetch Error",
+            description: "Failed to fetch updated data for the Roles.",
+          });
+          setLoading(false);
+        });
+    };
+  
     
     const handleSelectUser = (id) => {
       setUserId(id);
@@ -413,66 +438,77 @@
           </Box>
 
           {tabIndex === 0 && (
-            <TableContainer
-              component={Paper}
-              sx={{ borderRadius: 2, boxShadow: 3 }}
-            >
-              <Table>
-                <TableHead>
-                  <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                    <TableCell>Action</TableCell>
-                    <TableCell>Role</TableCell>
-                    <TableCell>Start Date</TableCell>
-                    <TableCell>End Date</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {roles.map((role, index) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                        <Tooltip title="Delete Role">
-                          <IconButton onClick={() => handleDeleteRole(index)}>
-                            <DeleteIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
-                      <TableCell>
-                        <TextField
-                          size="small"
-                          value={role.role}
-                          onChange={(e) =>
-                            handleRoleChange(index, "role", e.target.value)
-                          }
-                          fullWidth
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <TextField
-                          type="date"
-                          size="small"
-                          value={role.startDate}
-                          onChange={(e) =>
-                            handleRoleChange(index, "startDate", e.target.value)
-                          }
-                          fullWidth
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <TextField
-                          type="date"
-                          size="small"
-                          value={role.endDate}
-                          onChange={(e) =>
-                            handleRoleChange(index, "endDate", e.target.value)
-                          }
-                          fullWidth
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+      <TableContainer
+      component={Paper}
+      sx={{ borderRadius: 2, boxShadow: 3 }}
+    >
+   <Table>
+    {/* Table Header */}
+    <TableHead>
+      <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+        <TableCell>Action</TableCell>
+        <TableCell>Role</TableCell>
+        <TableCell>Start Date</TableCell>
+        <TableCell>End Date</TableCell>
+      </TableRow>
+    </TableHead>
+
+    {/* Table Body */}
+    <TableBody>
+      {roles?.map((role, index) => (
+        <TableRow key={index}>
+          {/* Action Column */}
+          <TableCell>
+            <Tooltip title="Delete Role">
+              <IconButton onClick={() => handleDeleteRole(index)}>
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+          </TableCell>
+
+          {/* Role Selection Column */}
+          <TableCell>
+  <Select
+    size="small"
+    value={roles[index]?.role || ""} // Correctly set the value for the specific role
+    onChange={(e) => handleRoleChange(index, "role", e.target.value)} // Update the role in the roles state
+    fullWidth
+  >
+    {roledata.map((roleOption) => (
+      <MenuItem key={roleOption.id} value={roleOption.role}>
+        {roleOption.role}
+      </MenuItem>
+    ))}
+  </Select>
+</TableCell>
+
+          {/* Start Date Column */}
+          <TableCell>
+            <TextField
+              type="date"
+              size="small"
+              value={role.startDate || ""}
+              onChange={(e) => handleRoleChange(index, "startDate", e.target.value)}
+              fullWidth
+            />
+          </TableCell>
+
+          {/* End Date Column */}
+          <TableCell>
+            <TextField
+              type="date"
+              size="small"
+              value={role.endDate || ""}
+              onChange={(e) => handleRoleChange(index, "endDate", e.target.value)}
+              fullWidth
+            />
+          </TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+    </TableContainer>
+    
           )}
         </Box>
         
