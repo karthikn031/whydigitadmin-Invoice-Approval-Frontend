@@ -8,7 +8,7 @@ import ActionButton from "./ActionButton";
 
 const CommonTable = ({
   data = [],
-  columns,
+  columns = [],  // Ensure columns are passed correctly
   onEdit,
   onGeneratePdf,
   showEdit = true,
@@ -74,14 +74,14 @@ const CommonTable = ({
         <ActionButton
           title="PDF"
           icon={PictureAsPdfIcon}
-          onClick={() => onGeneratePdf(row)}
+          onClick={() => onGeneratePdf(row.original)} // Pass full row data
         />
       )}
       {showEdit && (
         <ActionButton
           title="Edit"
           icon={EditIcon}
-          onClick={() => onEdit(row)}
+          onClick={() => onEdit(row.original)} // Pass full row data
         />
       )}
     </Box>
@@ -89,7 +89,7 @@ const CommonTable = ({
 
   return (
     <MaterialReactTable
-      columns={enhancedColumns}
+      columns={enhancedColumns}  // Ensure enhanced columns are passed here
       data={tableData}
       enableColumnOrdering
       enableEditing
