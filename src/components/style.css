@@ -359,7 +359,7 @@ ul li {
   font-size: 5em;
   letter-spacing: 15px;
   text-shadow: none;
-  animation: animate 1s infinite linear;
+  /* animation: animate 1s infinite linear; */
 }
 @keyframes animate {
   0% {
