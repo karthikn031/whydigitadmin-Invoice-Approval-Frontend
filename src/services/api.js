@@ -97,3 +97,70 @@ export const getAllUsers = async () => {
   }
 };
 
+
+
+export const getAllScreens = async () => {
+  try {
+    // Corrected the endpoint URL and closing braces issue
+    const response = await axios.get(`${API_URL}/api/auth/getAllScreenNames`);
+
+    // Ensure that the response contains the expected structure
+    if (response.data && response.data.paramObjectsMap?.screenNamesVO) {
+      return response.data.paramObjectsMap.screenNamesVO.map((item) => ({
+        id: item.id,
+        screenName: item.screenName,
+        screenCode: item.screenCode,
+        active: item.active,
+      }));
+    } else {
+      throw new Error("Data not found or API error");
+    }
+  } catch (error) {
+    console.error("Error fetching Screen List:", error);
+    throw error; // Re-throw error to propagate it to the caller
+  }
+};
+
+
+
+export const getAllRoles = async () => {
+  try {
+    // Corrected the endpoint URL and closing braces issue
+    const response = await axios.get(`${API_URL}/api/auth/allRoles`);
+    
+
+    // Ensure that the response contains the expected structure
+    if (response.data && response.data.paramObjectsMap?.rolesVO) {
+      return response.data.paramObjectsMap.rolesVO.map((item) => ({
+        id: item.id,
+        role: item.role
+      }));
+    } else {
+      throw new Error("Data not found or API error");
+    }
+  } catch (error) {
+    console.error("Error fetching Roles List:", error);
+    throw error; // Re-throw error to propagate it to the caller
+  }
+};
+
+
+export const getAllResponsiblities = async () => {
+  try {
+    // Corrected the endpoint URL and closing braces issue
+    const response = await axios.get(`${API_URL}/api/auth/allResponsibility`);
+
+    // Ensure that the response contains the expected structure
+    if (response.data && response.data.paramObjectsMap?.responsibilityVO) {
+      return response.data.paramObjectsMap.responsibilityVO.map((item) => ({
+        id: item.id,
+        responsibility: item.responsibility
+      }));
+    } else {
+      throw new Error("Data not found or API error");
+    }
+  } catch (error) {
+    console.error("Error fetching Responsibilities List:", error);
+    throw error; // Re-throw error to propagate it to the caller
+  }
+};
