@@ -72,9 +72,6 @@ export const getInvDetailsApprove1 = async () => {
   }
 };
 
-
-
-
 export const getAllUsers = async () => {
   try {
     // Corrected the endpoint URL and closing braces issue
@@ -97,7 +94,32 @@ export const getAllUsers = async () => {
   }
 };
 
+export const getAllActiveUsers = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/api/auth/allUsers`);
 
+    // Ensure that the response contains the expected structure
+    if (response.data && response.data.paramObjectsMap?.userVO) {
+      // Filter the users by active status
+      const activeUsers = response.data.paramObjectsMap.userVO.filter(
+        (item) => item.active === "Active"
+      );
+
+      // Map the filtered users to the required format
+      return activeUsers.map((item) => ({
+        id: item.id,
+        userName: item.userName,
+        nickName: item.nickName,
+        email: item.email,
+      }));
+    } else {
+      throw new Error("Data not found or API error");
+    }
+  } catch (error) {
+    console.error("Error fetching listing data:", error);
+    throw error; // Re-throw error to propagate it to the caller
+  }
+};
 
 export const getAllScreens = async () => {
   try {
@@ -121,19 +143,16 @@ export const getAllScreens = async () => {
   }
 };
 
-
-
 export const getAllRoles = async () => {
   try {
     // Corrected the endpoint URL and closing braces issue
-    const response = await axios.get(`${API_URL}/api/auth/allRoles`);
-    
+    const response = await axios.get(`${API_URL}/api/auth/allActiveRoles`);
 
     // Ensure that the response contains the expected structure
     if (response.data && response.data.paramObjectsMap?.rolesVO) {
       return response.data.paramObjectsMap.rolesVO.map((item) => ({
         id: item.id,
-        role: item.role
+        role: item.role,
       }));
     } else {
       throw new Error("Data not found or API error");
@@ -144,7 +163,6 @@ export const getAllRoles = async () => {
   }
 };
 
-
 export const getAllResponsiblities = async () => {
   try {
     // Corrected the endpoint URL and closing braces issue
@@ -154,7 +172,7 @@ export const getAllResponsiblities = async () => {
     if (response.data && response.data.paramObjectsMap?.responsibilityVO) {
       return response.data.paramObjectsMap.responsibilityVO.map((item) => ({
         id: item.id,
-        responsibility: item.responsibility
+        responsibility: item.responsibility,
       }));
     } else {
       throw new Error("Data not found or API error");
