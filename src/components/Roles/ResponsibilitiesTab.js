@@ -1,7 +1,9 @@
 import {
   Checkbox,
+  FormControl,
   FormControlLabel,
   Grid,
+  InputLabel,
   ListItemText,
   MenuItem,
   Select,
@@ -54,34 +56,41 @@ const ResponsibilitiesTab = ({
         />
       </Grid>
       <Grid item xs={3}>
-        <Select
-          label="Screen"
-          name="screenName"
-          value={responsibilitiesData.screenName || []} // Ensure this is an array
-          onChange={handleResponsibilitiesChange}
-          fullWidth
-          size="small"
-          multiple // Enables multi-select
-          renderValue={(selected) => selected.join(", ")} // Displays selected values as a comma-separated string
-        >
-          {/* Map the screenData to MenuItems */}
-          {screenData.map((screenName) => (
-            <MenuItem key={screenName} value={screenName}>
-              <Checkbox
-                checked={responsibilitiesData.screenName?.includes(screenName)} // Check if screen is selected
-              />
-              <ListItemText primary={screenName} />
-            </MenuItem>
-          ))}
-        </Select>
+        <FormControl fullWidth size="small">
+          <InputLabel id="screen-select-label">Screen</InputLabel>
+          <Select
+            labelId="screen-select-label" // Associates the label with the Select
+            name="screenName"
+            value={responsibilitiesData.screenName || []} // Ensure this is an array
+            onChange={handleResponsibilitiesChange}
+            multiple // Enables multi-select
+            renderValue={(selected) => selected.join(", ")} // Displays selected values as a comma-separated string
+          >
+            {/* Map the screenData to MenuItems */}
+            {screenData.map((screenName) => (
+              <MenuItem key={screenName} value={screenName}>
+                <Checkbox
+                  checked={responsibilitiesData.screenName?.includes(
+                    screenName
+                  )} // Check if screen is selected
+                />
+                <ListItemText primary={screenName} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Grid>
       <Grid item xs={3}>
         <FormControlLabel
           control={
             <Checkbox
               name="active"
-              checked={responsibilitiesData.active || false} // Ensure this is a boolean
-              onChange={handleResponsibilitiesChange}
+              checked={responsibilitiesData.active} // Ensure this is a boolean
+              onChange={(e) =>
+                handleResponsibilitiesChange({
+                  target: { name: e.target.name, value: e.target.checked },
+                })
+              }
               size="small"
             />
           }

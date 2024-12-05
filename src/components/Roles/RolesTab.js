@@ -1,4 +1,14 @@
-import { Grid, MenuItem, Select, TextField } from "@mui/material";
+import {
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 
@@ -46,21 +56,45 @@ const RolesTab = ({ rolesData, handleRolesChange }) => {
         />
       </Grid>
       <Grid item xs={3}>
-        <Select
-          label="Responsibilities"
-          name="responsibilities"
-          value={rolesData.responsibilities || ""}
-          onChange={handleRolesChange}
-          fullWidth
-          size="small"
-        >
-          {/* Dynamically map responsibilities */}
-          {resData.map((responsibility, index) => (
-            <MenuItem key={index} value={responsibility}>
-              {responsibility}
-            </MenuItem>
-          ))}
-        </Select>
+        <FormControl fullWidth size="small">
+          <InputLabel id="responsibility-select-label">
+            Responsibility
+          </InputLabel>
+          <Select
+            labelId="responsibility-select-label"
+            name="responsibility"
+            value={rolesData.responsibility || []} // Ensure it's an array
+            onChange={handleRolesChange}
+            multiple // Enables multi-select
+            renderValue={(selected) => selected.join(", ")} // Displays selected values as a comma-separated string
+          >
+            {/* Dynamically map responsibilities */}
+            {resData.map((responsibility, index) => (
+              <MenuItem key={index} value={responsibility}>
+                <Checkbox
+                  checked={rolesData.responsibility?.includes(responsibility)} // Check if selected
+                />
+                <ListItemText primary={responsibility} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+      <Grid item xs={3}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              name="active"
+              checked={rolesData.active || false} // Default to false if undefined
+              onChange={(e) =>
+                handleRolesChange({
+                  target: { name: e.target.name, value: e.target.checked },
+                })
+              }
+            />
+          }
+          label="Active"
+        />
       </Grid>
     </Grid>
   );

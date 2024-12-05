@@ -116,7 +116,7 @@ export const Screen = () => {
   };
 
   const handleClearRole = () => {
-    setResponsibilitiesData({
+    setRolesData({
       role: "",
       responsibility: "",
       active: false,
@@ -124,6 +124,8 @@ export const Screen = () => {
   };
 
   const screenHeaders = ["id", "screenName", "screenCode", "active"]; // Example header
+  const resHeaders = ["id", "responsibility", "screenName", "active"]; // Example header
+  const roleHeaders = ["id", "role", "responsibility", "active"]; // Example header
 
   const getScreenNames = async () => {
     try {
@@ -144,7 +146,7 @@ export const Screen = () => {
 
   const getScreenById = async (row) => {
     setEditId(true);
-    setScreenDataList(true);
+    setScreenListView(false);
 
     console.log("Test", row);
     try {
@@ -160,7 +162,7 @@ export const Screen = () => {
         setScreenData({
           screenCode: screen.screenCode,
           screenName: screen.screenName,
-          active: screen.active,
+          active: screen.active === "Active" ? true : false,
           id: screen.id,
         });
       } else {
@@ -198,7 +200,7 @@ export const Screen = () => {
       );
 
       if (response.data.status === true) {
-        const audio = new Audio("/success.wav"); // Replace with your sound file path
+        getScreenNames(); // Replace with your sound file path
         handleClearScreen();
 
         // Success logic here
@@ -229,9 +231,75 @@ export const Screen = () => {
       const response = await axios.get(`${API_URL}/api/auth/allResponsibility`);
 
       if (response.status === 200) {
+        const responsibilityData =
+          response.data.paramObjectsMap.responsibilityVO;
+
+        // Transform the data for the table
+        const transformedData = transformDataForTable(responsibilityData);
+        setResDataList(transformedData);
+      } else {
+        console.error("Failed to fetch responsibilities");
+      }
+    } catch (error) {
+      console.error("Error fetching responsibilities:", error);
+      alert("Error occurred while fetching responsibilities.");
+    }
+  };
+
+  const getResById = async (row) => {
+    setEditId(true);
+    setResListView(false);
+
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/auth/responsibilityById?id=${row.id}`
+      );
+
+      if (response.status === 200) {
+        const screen = response.data.paramObjectsMap.responsibilityVO;
+
+        // Map the screen names from the API response
+        const screenNames = screen.screensVO.map((screen) => screen.screenName);
+
+        setResponsibilitiesData({
+          responsibility: screen.responsibility,
+          screenName: screenNames, // Set screenName as an array of names
+          active: screen.active === "Active" ? true : false,
+          id: screen.id,
+        });
+      } else {
+        console.error("Failed to fetch responsibility details");
+      }
+    } catch (error) {
+      console.error("Error fetching responsibility details:", error);
+      alert("Error occurred while fetching responsibility details.");
+    }
+  };
+
+  const getRoleById = async (row) => {
+    setEditId(true);
+    setRoleListView(false);
+
+    console.log("Test", row);
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/auth/rolesById?id=${row.id}`
+      );
+
+      if (response.status === 200) {
         // Extract only the screenName values and set them in screenData
 
-        setResListView(response.data.paramObjectsMap.responsibilityVO); // Setting only screenName values in the state
+        const screen = response.data.paramObjectsMap.rolesVO;
+        const screenNames = screen.rolesReposibilitiesVO.map(
+          (screen) => screen.responsibility
+        );
+
+        setRolesData({
+          role: screen.role,
+          responsibility: screenNames,
+          active: screen.active === "Active" ? true : false,
+          id: screen.id,
+        });
       } else {
         console.error("Failed to fetch screen names");
       }
@@ -247,8 +315,11 @@ export const Screen = () => {
 
       if (response.status === 200) {
         // Extract only the screenName values and set them in screenData
+        // Setting only screenName values in the state
+        const roleData = response.data.paramObjectsMap.rolesVO;
 
-        setRolesData(response.data.paramObjectsMap.rolesVO); // Setting only screenName values in the state
+        const transformedData = transformDataForTableForRole(roleData);
+        setRoleDataList(transformedData);
       } else {
         console.error("Failed to fetch screen names");
       }
@@ -282,6 +353,7 @@ export const Screen = () => {
       screensDTO: responsibilitiesData.screenName.map((screenName) => ({
         screenName,
       })),
+      id: editId ? responsibilitiesData.id : undefined,
     };
 
     try {
@@ -291,16 +363,8 @@ export const Screen = () => {
       );
 
       if (response.data.status === true) {
-        const audio = new Audio("/success.wav"); // Replace with your sound file path
-        audio.play();
-
-        // Success logic here
-        // notification.success({
-        //   message: `Item ${item.id} Rejected`,
-        //   description: `You have rejected item ${item.id}.`,
-        // });
-        // fetchData();
-        // setIsModalOpen(false);
+        handleClearRes();
+        getResponsibility();
       } else {
         // Handle failure response
         // notification.error({
@@ -331,8 +395,13 @@ export const Screen = () => {
     const payload = {
       active: rolesData.active,
       createdBy: localStorage.getItem("userName"),
-      responsibilities: rolesData.responsibility,
-      role: rolesData.screenName,
+      rolesResponsibilityDTO: rolesData.responsibility.map(
+        (responsibility) => ({
+          responsibility,
+        })
+      ),
+      role: rolesData.role,
+      id: editId ? rolesData.id : undefined,
     };
 
     try {
@@ -342,8 +411,8 @@ export const Screen = () => {
       );
 
       if (response.data.status === true) {
-        const audio = new Audio("/success.wav"); // Replace with your sound file path
-        audio.play();
+        handleClearRole();
+        getRole();
 
         // Success logic here
         // notification.success({
@@ -366,6 +435,27 @@ export const Screen = () => {
         "An unexpected error occurred. Please try again.";
       alert(errorMessage); // Show error message
     }
+  };
+
+  const transformDataForTable = (responsibilityData) => {
+    return responsibilityData.map((item) => ({
+      id: item.id,
+      responsibility: item.responsibility,
+      screenName: item.screensVO.map((screen) => screen.screenName).join(", "),
+      active: item.active,
+      createdBy: item.createdBy,
+    }));
+  };
+
+  const transformDataForTableForRole = (RoleData) => {
+    return RoleData.map((item) => ({
+      id: item.id,
+      role: item.role,
+      responsibility: item.rolesReposibilitiesVO
+        .map((screen) => screen.responsibility)
+        .join(", "),
+      active: item.active,
+    }));
   };
 
   return (
@@ -479,7 +569,11 @@ export const Screen = () => {
               </Grid>
             </Grid>
             {resListView ? (
-              <TableComp headers={screenHeaders} data={resDataList} />
+              <TableComp
+                headers={resHeaders}
+                data={resDataList}
+                onEdit={getResById}
+              />
             ) : (
               <ResponsibilitiesTab
                 responsibilitiesData={responsibilitiesData}
@@ -501,20 +595,6 @@ export const Screen = () => {
                     mb: 2,
                   }}
                 >
-                  {/* <Box>
-                    <IconButton>
-                      <SearchIcon />
-                    </IconButton>
-                    <IconButton>
-                      <CloseIcon />
-                    </IconButton>
-                    <IconButton>
-                      <ListAltIcon />
-                    </IconButton>
-                    <IconButton>
-                      <SaveIcon onClick={handleRolesSave} />
-                    </IconButton>
-                  </Box> */}
                   <Box sx={{ display: "flex", gap: 1 }}>
                     <Tooltip title="Search">
                       <IconButton>
@@ -541,7 +621,11 @@ export const Screen = () => {
               </Grid>
             </Grid>
             {roleListView ? (
-              <TableComp headers={screenHeaders} data={roleDataList} />
+              <TableComp
+                headers={roleHeaders}
+                data={roleDataList}
+                onEdit={getRoleById}
+              />
             ) : (
               <RolesTab
                 rolesData={rolesData}

@@ -9,8 +9,6 @@ import Overview from "./components/Overview";
 import { Reports } from "./components/Reports";
 import { Screen } from "./components/Screen";
 import { UserCreation } from "./components/UserCreation";
-import ApprovedReport from "./components/ApprovedReport";
-
 
 function App() {
   return (
@@ -26,7 +24,7 @@ function App() {
           <Route path="/reports" element={<Reports />} />
           <Route path="/screen" element={<Screen />} />
           <Route path="/userCreation" element={<UserCreation />} />
-          <Route path="/approvedReport" element={<ApprovedReport />} />
+          {/* <Route path="/approvedReport" element={<ApprovedReport />} /> */}
         </Route>
       </Routes>
     </Router>
